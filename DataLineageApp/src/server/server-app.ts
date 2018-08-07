@@ -8,7 +8,6 @@ import bodyParser = require("body-parser");
 import index from "./routes/index";
 import address from "./routes/address";
 import * as simulate from "./routes/simulate";
-import performance from "./routes/performance-test";
 import config from "./server-config";
 import { initIOServer } from "./socket.io-server";
 
@@ -30,11 +29,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", index);
 app.use("/simulate", simulate.routerUI);
-app.use("/performance", performance.router);
 app.use("/api/address", address);
 app.use("/api/simulate", simulate.routerApi);
-app.use("/api/performance", performance.routerApi);
-
 
 
 // catch 404 and forward to error handler

@@ -9,8 +9,7 @@ const config: webpack.Configuration = {
         "client-app": "./src/client/client-app.ts",
         "client-app-tree": "./src/client/client-app-tree.ts",
         "simulate-publisher": "./src/client/simulate/publisher-app.tsx",
-        "simulate-processor": "./src/client/simulate/processor-app.tsx",
-        "performance": "./src/client/performance/performance-app.tsx"
+        "simulate-processor": "./src/client/simulate/processor-app.tsx"
     },
     output: {
         path: path.resolve(__dirname, "./dist/public/javascripts/"),
