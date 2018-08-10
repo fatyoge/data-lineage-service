@@ -42,7 +42,7 @@ export class InputChannelSelector extends React.Component<IProp, State> {
     private renderOnePublisherInput(index: number, address: string) {
         const id = `publisher-root-address-input-${index}`;
         return <div className="form-group row" key={index}>
-                   <label htmlFor={id} className="col-sm-2 col-form-label">Channel root address</label>
+                   <label htmlFor={id} className="col-sm-2 col-form-label">Channel address</label>
                    <div className="col-sm-10 input-group">
                        <div className="input-group-prepend" onClick={this.onRemoveClicked.bind(this, index)}>
                            <div className="input-group-text"><i className="fas fa-trash-alt"></i></div>
@@ -54,13 +54,13 @@ export class InputChannelSelector extends React.Component<IProp, State> {
 
     render() {
         return <React.Fragment>
-            <p className="h4">Add input channels:</p>
+            <p className="h5">Step 2: Specify input channel(s):</p>
             {this.state.hasError && <div className="alert alert-warning" role="alert">
-                                        Need one channel address at least.
+                                        Please provide at least one channel as input.
                                     </div>}
             <div className="form-group row">
                 <div className="col-auto">
-                    <button type="button" className="btn btn-primary" onClick={this.onAddClicked.bind(this)}>Add Channel</button>
+                    <button type="button" className="btn btn-primary" onClick={this.onAddClicked.bind(this)}>Add channel</button>
                 </div>
                 <div className="col-auto">
                     <button type="button" className="btn btn-success" onClick={this.onInputsConfirmClicked.bind(this)}>OK</button>

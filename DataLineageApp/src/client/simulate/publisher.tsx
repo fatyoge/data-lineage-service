@@ -115,7 +115,7 @@ export class Publisher extends React.Component<IProp, State> {
             return;
         }
         const pkgId = uuid();
-        this.log(`submitting package ${pkgId}`);
+        this.log(`Submitting data package with auto-generated package Id: ${pkgId}`);
         this.setState({ isSubmitting: true });
         const newPkg = {
             inputs: this.state.packageInputsAddress,
@@ -139,12 +139,12 @@ export class Publisher extends React.Component<IProp, State> {
                 });
             if (pkg) {
                 this.setState({ value: "", packageInputsAddress: [] });
-                this.log(`package is submitted as below: \n ${JSON.stringify(pkg, null, 4)}`);
+                this.log(`Data package is submitted as below: \n ${JSON.stringify(pkg, null, 4)}`);
             } else {
-                this.log(`package submitte failed.`);
+                this.log(`Data package submit failed.`);
             }
         } catch (e) {
-            this.log(`package submitte failed with error ${JSON.stringify(e)}.`);
+            this.log(`Data package submit failed with error ${JSON.stringify(e)}.`);
         } 
         this.setState({ isSubmitting: false });
         event.preventDefault();
@@ -159,12 +159,12 @@ export class Publisher extends React.Component<IProp, State> {
         this.setState(changed);
     }
 
-    private onOperationChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+    private onOperationChanged(event: React.ChangeEvent<HTMLSelectElement>) { 
         this.setState({operation: event.target.value});
     }
 
     private onPackageTypeChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({packageType: event.target.value as any});
+        this.setState({packageType: event.target.value as any}); 
     }
 
     private onPackageSelectedAsInput(pkg: IDataPackage, selected: boolean) {
@@ -230,10 +230,10 @@ export class Publisher extends React.Component<IProp, State> {
         return <React.Fragment>
             <div className="form-row align-items-center">
                 <div className="col-sm-2">
-                    <label>Add more fields</label>
+                    <label>Add new fields (optional)</label>
                 </div>
                 <div className="col-sm-10">
-                    <button type="submit" className="btn btn-primary mb-2" onClick={this.onAddFieldClick.bind(this)}>Add Field</button>
+                    <button type="submit" className="btn btn-primary mb-2" onClick={this.onAddFieldClick.bind(this)}>Add more field</button>
                 </div>
             </div>
             {this.state.otherFields.map((item, index) => <div className="form-group row" key={index}>
@@ -241,7 +241,7 @@ export class Publisher extends React.Component<IProp, State> {
                 <div className="col-sm-5">
                     <div className="input-group">
                         <div className="input-group-prepend">
-                            <div className="input-group-text">Field</div>
+                            <div className="input-group-text">Field name</div>
                             <div className="input-group-text" onClick={this.onRemoveFieldClick.bind(this, index)}>
                                 <i className="fas fa-trash-alt"></i>
                             </div>
@@ -264,30 +264,33 @@ export class Publisher extends React.Component<IProp, State> {
     }
 
     private renderValueInput() {
-        return <div className="row">
-                   <div className="col-sm-12">
+        return <div className="card">
+                   <div className="card-header">
+                    Create data package
+                   </div>
+                   <div className="card-body">
                        <div className="form-group row">
-                           <label htmlFor="valueInput" className="col-sm-2 col-form-label">Value</label>
+                           <label htmlFor="valueInput" className="col-sm-2 col-form-label">Data package content</label>
                            <div className="col-sm-10">
                                <div className="input-group">
                                    <div className="input-group-prepend">
                                        <div className="input-group-text"><i className="fas fa-code-branch"></i></div>
                                    </div>
-                                   <input value={this.state.value} onChange={this.onValueChange.bind(this, "value")} type="text" className={`form-control ${this.state.valueIsValid ? "" : "is-invalid"}`} id="valueInput" placeholder="Input the new value" required />
-                                   <div className="invalid-feedback">Please input the value.</div>
+                                   <input value={this.state.value} onChange={this.onValueChange.bind(this, "value")} type="text" className={`form-control ${this.state.valueIsValid ? "" : "is-invalid"}`} id="valueInput" placeholder="Data package content (e.g. 'Room temperature = 20°C')" />
+                                   <div className="invalid-feedback">Please input data package content.</div>
                                </div>
                            </div>
                        </div>
                        {this.renderOtherFields()}
                        {this.renderOperationField()}
                        <div className="form-group row">
-                           <label htmlFor="valueInput" className="col-sm-2 col-form-label">Owner metadata</label>
+                           <label htmlFor="valueInput" className="col-sm-2 col-form-label">Owner information (optional)</label>
                            <div className="col-sm-10">
                                <div className="input-group">
                                    <div className="input-group-prepend">
                                    <div className="input-group-text"><i className="fas fa-address-book"></i></div>
                                    </div>
-                                   <input value={this.state.ownerMetadata} onChange={this.onValueChange.bind(this, "ownerMetadata")} type="text" className="form-control" placeholder="Owner information" />
+                                   <input value={this.state.ownerMetadata} onChange={this.onValueChange.bind(this, "ownerMetadata")} type="text" className="form-control" placeholder="Data owner information (e.g. 'Company name' or 'Sensor id')" />
                                </div>
                            </div>
                        </div>
@@ -298,12 +301,12 @@ export class Publisher extends React.Component<IProp, State> {
                                    <div className="form-check">
                                        <input onChange={this.onPackageTypeChanged.bind(this)} className="form-check-input" type="radio" name="packageType" id="packageTypeSimpleInput" value={lightweight} checked={this.state.packageType === lightweight}/>
                                        <label className="form-check-label" htmlFor="packageTypeSimpleInput">{`${
-                                           lightweight} protocol`}</label>
+                                           lightweight} protocol (publish *content* of the data itself directly into channel)`}</label>
                                    </div>
                                    <div className="form-check">
                                        <input onChange={this.onPackageTypeChanged.bind(this)} className="form-check-input" type="radio" name="packageType" id="packageTypeStandardInput" value={standard} checked={this.state.packageType === standard}/>
                                        <label className="form-check-label" htmlFor="packageTypeStandardInput">{`${
-                                           standard} protocol`}</label>
+                                           standard} protocol (publish SHA256-based *signature* of the data into channel)`}</label>
                                    </div>
                                </div>
                            </div>
@@ -311,7 +314,7 @@ export class Publisher extends React.Component<IProp, State> {
 
                        <div className="form-group row">
                            <div className="col-sm-10">
-                               <button type="button" className="btn btn-primary mb-2" onClick={this.onAddClick.bind(this)}>Add
+                               <button type="button" className="btn btn-primary mb-2" onClick={this.onAddClick.bind(this)}>Submit 
                                    {this.state.isSubmitting && <i className="fas fa-sync-alt fa-spin"/>}
                                </button>
                            </div>
@@ -331,7 +334,7 @@ export class Publisher extends React.Component<IProp, State> {
         return <React.Fragment>
                    {has &&
                        <div className="row form-group">
-                           <label className="col-sm-2 col-form-label">Operation</label>
+                           <label className="col-sm-2 col-form-label">Operation type</label> 
                            <div className="col-sm-10">
                                <div className="input-group">
                                    <select value={this.state.operation} onChange={this.onOperationChanged.bind(this)} className={`form-control ${this.state.operationIsValid ? "" : "is-invalid"}`} required={true}>
@@ -340,13 +343,10 @@ export class Publisher extends React.Component<IProp, State> {
                                    <div className="invalid-feedback">Please select the operation.</div>
                                </div>
                            </div>
-                       </div>}
-                   {has &&
-                       <div className="row form-group">
                            <div className="col-sm-2">
                            </div>
                            <div className="col-sm-10">
-                               <p>{selectedOp ? selectedOp.description : ""}</p>
+                               <p><b>{selectedOp ? DataOperationCategory[selectedOp.category] : ""}</b>: {selectedOp ? selectedOp.description : ""}</p>
                            </div>
                        </div>}
                </React.Fragment>;

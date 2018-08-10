@@ -1,6 +1,6 @@
 {
   "name": "data-lineage-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ./dist/server-app",
@@ -15,9 +15,9 @@
     "clean": "del-cli dist/** && del-cli cmd_tools/**",
     "cmd:simulate": "node ./cmd_tools/cmds/mam-cmd.js -simulate"
   },
-  "description": "DataLineageApp",
+  "description": "Data Lineage Viewer",
   "author": {
-    "name": "DNVGL"
+    "name": "Veracity"
   },
   "devDependencies": {
     "@types/bootstrap": "^4.1.2",
