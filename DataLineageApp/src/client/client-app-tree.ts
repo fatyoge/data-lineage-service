@@ -66,7 +66,7 @@ class App {
     /**
      * 
      * @param data
-     * @param index, accroding to d3js, index is fixed when listern registered, so don't use it
+     * @param index, according to d3js, index is fixed when listener registered, so don't use it
      * @param nodes
      */
     private async onNodeClicked(data: d3.HierarchyPointNode<IPackageTreeData>, index, nodes): Promise<void> {
@@ -197,7 +197,7 @@ class App {
         if (address === this._rootPkgAddress || this._packages.getInputTo(address).length > 0) {
             const pkg = await this.fetchPackage(address, expandAll);
             if (!pkg || pkg.length <= 0) {
-                notify(NotifyType.Warning, `Can't find the package with the address ${address}`);
+                notify(NotifyType.Warning, `Can't find the package with the address: ${address}`);
                 return;
             }
             this.updateByData(pkg);

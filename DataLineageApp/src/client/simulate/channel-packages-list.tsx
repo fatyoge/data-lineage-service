@@ -50,7 +50,7 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
                 address = pkgs[0].nextRootAddress;
                 this.setState({ packages: this.state.packages.concat([{ package: pkgs[0] }]) });
             } catch (e) {
-                console.error(`fetach package for address ${address} failed with error ${e}`);
+                console.error(`fetch package for address ${address} failed with error ${e}`);
                 break;
             }
         }
@@ -58,10 +58,17 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
     }
 
     render() {
-        return <div className="card">
+        return <div>
+                <h5>
+                    Select packages from channels
+                </h5>
+                <p>
+                    By selecting input packages, you are declaring that you are using these packages as inputs (upper stream), then perform tasks to produce your data package. This relationship will be shown in the data lineage viewer.    
+                </p>
+                <div className="card">
                    <div className="card-header">
                        <div className={this.state.isLoading ? "alert alert-primary" : ""} role={this.state.isLoading ? "alert" : ""}>
-                           {`Packages in the channel ${this.props.rootAddress}`}
+                           {`Packages in the channel: ${this.props.rootAddress}`}
                            {this.state.isLoading && <i className="fas fa-sync-alt fa-spin"/>}
                        </div>
                    </div>
@@ -70,8 +77,8 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
                            <thead>
                            <tr>
                                <th scope="col"></th>
-                               <th scope="col">Id</th>
-                               <th scope="col">Value/Signature</th>
+                               <th scope="col">Data package Id</th>
+                               <th scope="col">Data value / Data signature</th>
                            </tr>
                            </thead>
                            <tbody>
@@ -84,6 +91,7 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
                            </tbody>
                        </table>
                    </div>
+                </div>
                </div>;
     }
 }

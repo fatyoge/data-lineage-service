@@ -101,3 +101,11 @@ circle.package {
 .popover.pacakge-tooltip .card {
     width: 20rem;
 }
+
+#simlate-processor-app .card {
+    margin-bottom: 25px
+}
+
+#simlate-publisher-app .card {
+    margin-bottom: 25px
+}
