@@ -264,9 +264,11 @@ export class Publisher extends React.Component<IProp, State> {
     }
 
     private renderValueInput() {
-        return <div className="card">
+        return  <div>
+                <p className="h5">Step 2: Create data package</p>
+                 <div className="card">
                    <div className="card-header">
-                    Create data package
+                    Data package information
                    </div>
                    <div className="card-body">
                        <div className="form-group row">
@@ -320,6 +322,7 @@ export class Publisher extends React.Component<IProp, State> {
                            </div>
                        </div>
                    </div>
+                </div>
                </div>;
     }
 
@@ -365,6 +368,7 @@ export class Publisher extends React.Component<IProp, State> {
 
     render() {
         return <React.Fragment>
+                   <h5> Step 1: Specify a channel by using seed </h5>
                    <SeedInput seed={this.state.seed} onSeedConfirmed={this.confirmeSeed.bind(this)}/>
                    {(typeof (this.props.inputsConfirmed) === "undefined" || this.props.inputsConfirmed) &&
                        <React.Fragment>

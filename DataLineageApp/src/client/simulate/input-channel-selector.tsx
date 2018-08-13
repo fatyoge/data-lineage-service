@@ -54,7 +54,7 @@ export class InputChannelSelector extends React.Component<IProp, State> {
 
     render() {
         return <React.Fragment>
-            <p className="h5">Step 2: Specify input channel(s):</p>
+            <p className="h5">Step 1.1: Specify input channel(s):</p>
             {this.state.hasError && <div className="alert alert-warning" role="alert">
                                         Please provide at least one channel as input.
                                     </div>}

@@ -38,18 +38,6 @@ export class SeedInput extends React.Component<IProp, State>{
 
     private renderInputMode() {
         return <div>
-                <div>
-                    <h5>
-                        Step 1: Specify a channel by using seed
-                    </h5>    
-                    <p>
-                        In MAM protocol, data is stored by channels in IOTA tangle. The channel's seed is a sort of private key that authorize you to publish data into that channel.
-                        The seed should be well protected, so people can ensure it is only you, the channel owner, can publish data into your channel.
-                    </p>   
-                    <p>
-                        Typically one data source (i.e. a sensor) owns one seed, and therefore, it owns a dedicated channel. One people or one company can have multiple seeds and channels.
-                    </p> 
-                </div>
                 <div className="form-row align-items-center">
                    <div className="col-sm-4">
                        <label className="sr-only" htmlFor="seedInput">Seed</label>
@@ -64,6 +52,13 @@ export class SeedInput extends React.Component<IProp, State>{
                        <button onClick={this.onConfirmSeed.bind(this)} type="button" className="btn btn-primary mb-2">{this.state.seed ? "Next" : "Generate"}</button>
                    </div>
                 </div>
+                <p>
+                    In MAM protocol, data is stored by channels in IOTA tangle. The channel's seed is a sort of private key that authorize you to publish data into that channel.
+                    The seed should be well protected, so people can ensure it is only you, the channel owner, can publish data into your channel.
+                </p>   
+                <p>
+                    Typically one data source (i.e. a sensor) owns one seed, and therefore, it owns a dedicated channel. One people or one company can have multiple seeds and channels.
+                </p> 
                 <p>
                         You can input an existing seed for sending data into an existing channel, or generate a new seed (and new channel) for publishing data.
                 </p>
