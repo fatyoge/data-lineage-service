@@ -1,8 +1,8 @@
 ﻿extends layout
 
 block content
-  h3 Publish data without input
-  p For data that does not have input dataset, such as sensor data, we can  publish the data integrity information into tangle. The integrity information allows others to verify if the data is indeed from that data source, and it is not tampered.
+  h3 Publish data integrity information
+  p For data that does not have input dataset, such as sensor data, we can publish the data integrity information into tangle. The integrity information allows others to verify if the data is indeed from that data source (because only the data source has the private seed), and it is not tampered.
   p This function helps you to send this information to tangle with defined schema.
   div(id="simlate-publisher-app")
 

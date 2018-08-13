@@ -10,11 +10,11 @@ const routerApi = express.Router();
 
 /* GET simulate UI. */
 routerUI.get("/publisher", (req, res) => {
-    res.render("simulate-publisher", { title: "Simulate - publisher" });
+    res.render("simulate-publisher", { title: "Publish data integrity information" });
 });
 
 routerUI.get("/processor", (req, res) => {
-    res.render("simulate-processor", { title: "Simulate - processor" });
+    res.render("simulate-processor", { title: "Publish data lineage information" });
 });
 
 interface IPackageSubmitData {
