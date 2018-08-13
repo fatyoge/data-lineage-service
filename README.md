@@ -12,7 +12,7 @@ The demo application is connecting to the IOTA Mainnet, by using the following n
 This application is using the official IOTA MAM library https://github.com/iotaledger/mam.client.js for interacting with IOTA tangle. Besides, it is based on Nodejs and Typescript for both frontend and server side.
 
 ### Connect to IOTA network
-The application supports connecting to multiple nodes at the same time, and will automatically uses the fastest one. You can specify the nodes in [config file](https://github.com/veracity/DataLineage-Viewer/blob/master/DataLineageApp/src/server/server-config.ts). 
+The application supports fall-back mechanism for connecting to multiple nodes: You specify a list of nodes in [config file](https://github.com/veracity/DataLineage-Viewer/blob/master/DataLineageApp/src/server/server-config.ts). The application will try to use the first one. If that is not working, then the application try to use the second one, etc... It helps especially if you are using public nodes and not sure if they are online.
 
 It also supports proxy to speed up the access to the IOTA.
 
@@ -20,6 +20,11 @@ It also supports proxy to speed up the access to the IOTA.
 The server side has two APIs:
 1. **/api/address/:address**: It loads data package information from a MAM address that is specified by parameter ":address". It is a "lazy load" that does **not** load information from *inputs* field.
 1. **/api/address/:address/all**. This loads the data package information from specified address, **plus** it loads all upper stream address information **recursively** from *inputs* field. All information is loaded into one array.
+
+### Publish functions
+This application also provide publish functions for demo purpose. We call them . Since these simulators do talk to IOTA mainnet, you can use them to write into tangle that will be available for all iota users.
+1. Publish data integrity information
+2. Publish data lineage information
 
 ### Caching
 In order to have a good performance, also considering the data is immutable in tangle (assuming it talks to a [permanode](https://iota.stackexchange.com/questions/782/full-node-vs-permanode/783)), we decide to use caching. 
@@ -65,4 +70,4 @@ this script will start webpack in watch mode and use nodemon to start server, so
 
 The project is tested with Nodejs 8.11.2
 
-.
+Enjoy!

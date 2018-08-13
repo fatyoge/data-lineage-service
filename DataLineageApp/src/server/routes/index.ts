@@ -7,7 +7,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/about", (req, res) => {
-    res.render("about", { title: "About Data Lineage" });
+    res.render("about", { title: "About Data Lineage Viewer" });
 });
 
 export default router;
