@@ -1,4 +1,4 @@
-﻿# Data Lineage Viewer
+﻿# Data Lineage Viewer  [![Build Status](https://travis-ci.com/veracity/DataLineage-Viewer.svg?branch=master)](https://travis-ci.com/veracity/DataLineage-Viewer)
 This data lineage viewer is a web based application that visualize the data lineage information, based on the paper [Data Integrity and Lineage by using IOTA](http://fenglu.me/2018/04/16/Data-integrity-and-data-lineage-by-using-IOTA/ "Data Integrity and Lineage by using IOTA").
 
 ## Live demo
