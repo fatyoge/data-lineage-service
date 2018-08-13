@@ -60,7 +60,7 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
     render() {
         return <div>
                 <h5>
-                    Select packages from channels
+                    Step 1.2: Select packages from channels
                 </h5>
                 <p>
                     By selecting input packages, you are declaring that you are using these packages as inputs (upper stream), then perform tasks to produce your data package. This relationship will be shown in the data lineage viewer.    
