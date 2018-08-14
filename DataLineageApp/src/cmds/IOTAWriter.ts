@@ -100,6 +100,10 @@ export default class IOTAWriter {
         console.log(`submitting new package ${json} ...`);
         // Create Trytes
         const trytes = this._iota.utils.toTrytes(json);
+        if (!trytes) {
+            console.error(`itoa library can't convert the json string ${json} to trytes string`);
+            return undefined;
+        }
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
         

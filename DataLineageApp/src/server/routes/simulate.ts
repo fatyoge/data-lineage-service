@@ -50,10 +50,14 @@ async function writeData(seed: string, data: IPackageSubmitData, lightweight: bo
     }
     delete pkg.mamAddress;
     delete pkg.nextRootAddress;
-    const attachResult = await writer.attachNew(pkg);
-    if (attachResult) {
-        pkg.mamAddress = attachResult.address;
-        pkg.nextRootAddress = attachResult.nextRoot;
+    try {
+        const attachResult = await writer.attachNew(pkg);
+        if (attachResult) {
+            pkg.mamAddress = attachResult.address;
+            pkg.nextRootAddress = attachResult.nextRoot;
+        }
+    } catch (e) {
+        console.error(`failed to attach the pacakge ${JSON.stringify(pkg)} with seed ${seed}, the exception is ${e}`);
     }
     
     if (!pkg.mamAddress) {
