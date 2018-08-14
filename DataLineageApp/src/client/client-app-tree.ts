@@ -233,6 +233,7 @@ class App {
         $(this.svgSelector).remove();
         parent.append(`<svg width="100%" id="${this._svgId}">`);
         this._svg = undefined as any;
+        this._packages.clear();
     }
 
     private static restWndHeight(): number {
@@ -269,6 +270,7 @@ $("#searchBtn").on("click",
         
         $(`#${pkgInfoContainerDivId}`).empty();
         const expandAll = $("#expandAllCheck").is(":checked");
+        app.close();
         app.update(address, expandAll);
         //after search, change the url to the format with the address so when user refresh the page will show the pacakge automatically
         window.history.pushState("new address", `Query Package ${address}`, `/?address=${address}&expandAll=${expandAll}`);
