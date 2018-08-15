@@ -42,10 +42,50 @@ export function packageDescriptionHtml(pkg: IDataPackage | ILightweightPackage |
 class DrawConfig {
     private _nodeRadius: number | undefined;
 
+    private hardCodeEvalCssValue(width: number): { r: number; strokeWidth: number } {
+        if (width <= 100) {
+            return {
+                r: 10,
+                strokeWidth: 7
+            };
+        } else if (width <= 576) {
+            return {
+                r: 10,
+                strokeWidth: 7
+            };
+        } else if (width <= 768) {
+            return {
+                r: 10,
+                strokeWidth: 7
+            };
+        } else if (width <= 992) {
+            return {
+                r: 15,
+                strokeWidth: 7
+            };
+        } else if (width <= 1200) {
+            return {
+                r: 16,
+                strokeWidth: 9
+            };
+        } else {
+            return {
+                r: 16,
+                strokeWidth: 9
+            };
+        }
+    }
+
     get nodeRadius() {
         //will try to get the circle.r from style (effected by css), if can't get, then will use default value of 8
-        if (this._nodeRadius) return this._nodeRadius;
+        //dynamic add/remove svg shape and applied with css only works on chrome, on Edge or firefox, this code cause exception
+        //so we change to hard code get the radius by svg width
         const $svg = $("svg");
+        if ($svg.length>0) {
+            return this.hardCodeEvalCssValue($svg.width() as number).r;
+        }
+        /*
+        if (this._nodeRadius) return this._nodeRadius;        
         if ($svg.length > 0) {
             const d3Svg = d3.select($svg[0] as any);
             const radiu = (): number | undefined => {
@@ -73,7 +113,7 @@ class DrawConfig {
             }
         }
         //8 is default value
-        
+        */
         return this._nodeRadius ? this._nodeRadius : 8;
     }
 

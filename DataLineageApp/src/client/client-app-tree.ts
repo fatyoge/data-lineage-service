@@ -144,6 +144,8 @@ class App {
         // adds the circle to the node
         const circle = node.append("circle")
             .attr("class", "package")
+        //although we enable css for r, but css for svg shape is supported only by chrome, so we need to explict set this again for making it work on Edge and firfox
+            .attr("r", drawConfig.nodeRadius)
             .attr("fill", d => this._packages.pacakgeColor(d.data.data.mamAddress) as string);
 
         
@@ -167,17 +169,10 @@ class App {
             txtElement.attr("dy", (rect.height / 2) * 0.6).attr("dx", -(rect.width / 2) * 0.65);
 
             d3.select(n).append("text")
+                .text(`Owner: ${pkg.ownerMetadata ? pkg.ownerMetadata : "Unkown"}`)
                 .attr("dx", drawConfig.nodeRadius * 1.5)
-                .attr("dy", drawConfig.nodeRadius * 0.5)
-                .text(`Owner: ${pkg.ownerMetadata ? pkg.ownerMetadata :"Unkown"}`);
+                .attr("dy", drawConfig.nodeRadius * 0.5);
         });
-
-        // adds the text to the node
-        //node.append("text")
-        //    .attr("dy", ".35em")
-        //    .attr("y", d => d.children ? -20 : 20)
-        //    .style("text-anchor", "middle")
-        //    .text(d => d.data.name);
     }
 
     /**
