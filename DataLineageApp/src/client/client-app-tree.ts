@@ -262,7 +262,10 @@ $("#searchBtn").on("click",
         if (!address) {
             address = $("#inputAddress").attr("placeholder") as string;
         }
-        
+        if (!address) {
+            alert("Please input the address to search");
+            return;
+        }
         $(`#${pkgInfoContainerDivId}`).empty();
         const expandAll = $("#expandAllCheck").is(":checked");
         app.close();
@@ -274,13 +277,13 @@ $("#searchBtn").on("click",
 /**
  * when window size is changed, we need to redraw all the nodes, becasue only change the svg size won't change the nodes position
  */
-$(window).on("resize",
-    () => {
-        if (app) {
-            app.close();
-            app.reset();
-        }
-    });
+//$(window).on("resize",
+//    () => {
+//        if (app) {
+//            app.close();
+//            app.reset();
+//        }
+//    });
 
 //Support to get params from url, for now, we support urls:
 //1. /, show the page with a serach input, and user need to input the address of the package

@@ -11,4 +11,14 @@ export default
         }
         return result.join("");
     }
+
+    public static containsUnicode(s: string): boolean {
+        for (let j = 0; s && j < s.length; j++) {
+            if (s.charCodeAt(j) > 255) {
+                //find non asicii code
+                return true;
+            }
+        }
+        return false;
+    }
 };
