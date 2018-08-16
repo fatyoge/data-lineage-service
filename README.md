@@ -70,4 +70,43 @@ this script will start webpack in watch mode and use nodemon to start server, so
 
 The project is tested with Nodejs 8.11.2
 
+## API
+We host the apis in http://datalineage-viewer.azurewebsites.net
+##### GET /api/address/:address/:all?
+**Parameters**:
+- **address**: required, the iota mam address of the package
+- **all**: optional, determin if the api should not only return the package specified by the address, but also return all the packages as the input of this pacakge and the packages as the inputs of these packages and so on. Any value for this parameter means get all packages, if not provided then only the package specified by the address will be returned.
+
+**Result**:
+Will return an array of the packages.
+
+**Remark**:
+To improve the performance, packages will be cached for two days by default, and the api will first check from the cache, if a matched package is found, then it will be return at once and not further query to IOTA
+
+##### POST /api/simulate/:packageType/
+**Headers**:
+This api requires seed as the header "seed".
+
+**Parameters**:
+- **packageType**: required, it can be "lightweight" or "standard"
+
+**Body**:
+The body is the json of the package data, which is defined as below:
+`interface IPackageSubmitData {
+    inputs?: string[];
+    value;
+    dataPackageId?: string;
+}`
+If the package is lightweight, the value will be the data field of the submitted package, otherwise value, package id and timestamp will be combined as a string and use sha256 to generate the hash code which will be saved in the data field of the submitted package.
+The body json can contain any other fields.
+
+Result:
+If the package is submitted to the IOTA successfully, then the submitted package will be returned, otherwise will return empty result.
+
+Remark:
+As IOTA doesn't have the api to get the last  address of the channel directly, so every time when a package will be being submitted, the api will first loop on the address chain and find the last address of the channel, and cache the mam status, so next time, if a mam status of a channel is found, the api will loop from this address instead.
+
+
+
+
 Enjoy!
