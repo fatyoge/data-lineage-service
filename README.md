@@ -100,10 +100,10 @@ The body is the json of the package data, which is defined as below:
 If the package is lightweight, the value will be the data field of the submitted package, otherwise value, package id and timestamp will be combined as a string and use sha256 to generate the hash code which will be saved in the data field of the submitted package.
 The body json can contain any other fields.
 
-Result:
+**Result**:
 If the package is submitted to the IOTA successfully, then the submitted package will be returned, otherwise will return empty result.
 
-Remark:
+**Remark**:
 As IOTA doesn't have the api to get the last  address of the channel directly, so every time when a package will be being submitted, the api will first loop on the address chain and find the last address of the channel, and cache the mam status, so next time, if a mam status of a channel is found, the api will loop from this address instead.
 
 
