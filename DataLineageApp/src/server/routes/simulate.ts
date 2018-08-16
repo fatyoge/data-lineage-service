@@ -71,20 +71,20 @@ async function writeData(seed: string, data: IPackageSubmitData, lightweight: bo
 /**
  * api for add package
  */
-routerApi.post("/lightweight/:seed/",
+routerApi.post("/lightweight/",
         async (req, res) => {
-            const seed = req.params["seed"];
-            if (!seed) {
+            const seed = req.headers["seed"] as string;
+            if (typeof seed !== "string") {
                 res.end(400);
                 return;
             }
             
             res.json(await writeData(seed, req.body, true));
         })
-    .post("/standard/:seed/",
+    .post("/standard/",
         async (req, res) => {
-            const seed = req.params["seed"];
-            if (!seed) {
+            const seed = req.headers["seed"] as string;
+            if (typeof seed !== "string") {
                 res.end(400);
                 return;
             }

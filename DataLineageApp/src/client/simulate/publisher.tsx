@@ -4,7 +4,9 @@ import { SeedInput } from "./seed-input";
 import { LogOutput } from "./log-output";
 import { ChannelPackagesList } from "./channel-packages-list";
 import { IDataPackage } from "../../server/data-package";
-import dataOperations, { DataOperationCategory, DataOperation} from "../process-operation";
+import dataOperations, { DataOperationCategory, DataOperation } from "../process-operation";
+import Utilities from "../../common/utilities";
+
 
 
 const lightweight = "lightweight";
@@ -86,6 +88,23 @@ export class Publisher extends React.Component<IProp, State> {
         }
     }
 
+    private createPackage(): IDataPackage {
+        const newPkg = {
+            inputs: this.state.packageInputsAddress,
+            value: this.state.value,
+            dataPackageId: uuid()
+        };
+
+        this.state.otherFields.forEach(f => newPkg[f.key] = f.value);
+        if (this.state.ownerMetadata) {
+            newPkg[nameof<IDataPackage>(p => p.ownerMetadata)] = this.state.ownerMetadata;
+        }
+        if (this.state.operation && this.notEmptyInputAddresses().length > 0) {
+            newPkg[nameof<IDataPackage>(p => p.operation)] = this.state.operation;
+        }
+        return newPkg as any;
+    }
+
     private validate(): boolean {
         let hasError = false;
         if (typeof (this.state.value) === "undefined" || this.state.value.trim() === "") {
@@ -107,6 +126,23 @@ export class Publisher extends React.Component<IProp, State> {
             this.setState({ operationIsValid: false });
             hasError = true;
         }
+        if (!hasError) {
+            //iota can only put ascii char
+            let hasUnicode = false;
+            if (Utilities.containsUnicode(this.state.ownerMetadata)) {
+                hasUnicode = true;
+            }
+            if (!hasUnicode && this.state.packageType === "lightweight") {
+                if (Utilities.containsUnicode(JSON.stringify(this.createPackage()))) {
+                    hasUnicode = true;
+                }
+            }
+            
+            if (hasUnicode) {
+                alert("For now, we only support ascii value. If unicode value is needed, the application can be extened for supporting encoding and decoding");
+                hasError = true;
+            }
+        }
         return !hasError;
     }
 
@@ -114,25 +150,14 @@ export class Publisher extends React.Component<IProp, State> {
         if (!this.validate()) {
             return;
         }
-        const pkgId = uuid();
-        this.log(`Submitting data package with auto-generated package Id: ${pkgId}`);
+        const newPkg = this.createPackage();
+        this.log(`Submitting data package with auto-generated package Id: ${newPkg.dataPackageId}`);
         this.setState({ isSubmitting: true });
-        const newPkg = {
-            inputs: this.state.packageInputsAddress,
-            value: this.state.value,
-            dataPackageId: pkgId
-        };
-        this.state.otherFields.forEach(f => newPkg[f.key] = f.value);
-        if (this.state.ownerMetadata) {
-            newPkg[nameof<IDataPackage>(p => p.ownerMetadata)] = this.state.ownerMetadata;
-        }
-        if (this.state.operation && this.notEmptyInputAddresses().length > 0) {
-            newPkg[nameof<IDataPackage>(p => p.operation)] = this.state.operation;
-        }
         try {
-            const pkg = await $.ajax(`/api/simulate/${this.state.packageType}/${this.state.seed}`,
+            const pkg = await $.ajax(`/api/simulate/${this.state.packageType}`,
                 {
                     method: "POST",
+                    headers: {seed: this.state.seed},
                     data: JSON.stringify(newPkg),
                     contentType: "application/json",
                     dataType: "json"
