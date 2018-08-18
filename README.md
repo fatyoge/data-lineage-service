@@ -38,7 +38,7 @@ For every 3 minutes, the server will save the memory cache to disk file. In case
 ```cmd
 git clone https://github.com/veracity/DataLineage-Viewer.git
 cd DataLineage-Viewer
-git git submodule update --init 
+git submodule update --init 
 ```
 
 ## How to build and run locally
