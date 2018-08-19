@@ -1,0 +1,56 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Data lineage Viewer APIs",
+    "version": "1.0.0",
+    "title": "Data Lineage Viewer"
+  },
+  "host": "~/",
+  "basePath": "/API",
+  "tags": [
+    {
+      "name": "Read",
+      "description": "Read lineage info from tangle"
+    },
+    {
+      "name": "Write",
+      "description": "Write lineage info to tangle"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/address/{address}": {
+      "get": {
+        "tags": [
+          "Read"
+        ],
+        "summary": "Get lineage information from an address",
+        "description": "Get lineage information from an address.",
+        "operationId": "getByAddres",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "MAM address",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "404": {
+            "description": "Information is not found from the address"
+          }
+        }
+      }
+    }
+  }
+}
