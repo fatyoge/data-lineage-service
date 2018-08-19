@@ -32,6 +32,16 @@ app.use("/simulate", simulate.routerUI);
 app.use("/api/address", address);
 app.use("/api/simulate", simulate.routerApi);
 
+//swaager
+var swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = require('./swagger.json');
+
+if (process.env.NODE_ENV === 'development') {
+    swaggerDocument.host="localhost:" + (process.env.PORT || 3000)
+    }
+
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
