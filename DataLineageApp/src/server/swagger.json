@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "title": "Data Lineage Viewer"
   },
-  "host": "~/",
+  "host": "datalineage-viewer.azurewebsites.net",
   "basePath": "/API",
   "tags": [
     {
