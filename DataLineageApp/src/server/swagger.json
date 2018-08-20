@@ -45,7 +45,7 @@
             "name": "all",
             "in": "path",
             "description": "determin if the api should not only return the package specified by the address, but also return all the packages as the input of this pacakge and the packages as the inputs of these packages and so on. Any value for this parameter means get all packages, if not provided then only the package specified by the address will be returned",
-            "required": true,
+            "required": false,
             "type": "string"
           }
         ],
