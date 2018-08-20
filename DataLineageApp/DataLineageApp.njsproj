@@ -57,6 +57,7 @@
     <Content Include="src\server\public\stylesheets\fontawesome\fontawesome-all.min.css" />
     <Content Include="src\server\public\stylesheets\main.css" />
     <Content Include="src\server\socket.io-server.ts" />
+    <Content Include="src\server\swagger.json" />
     <Content Include="src\server\tsconfig.json">
       <SubType>Code</SubType>
     </Content>

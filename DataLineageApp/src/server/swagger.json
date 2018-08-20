@@ -6,7 +6,7 @@
     "title": "Data Lineage Viewer"
   },
   "host": "datalineage-viewer.azurewebsites.net",
-  "basePath": "/API",
+  "basePath": "/api",
   "tags": [
     {
       "name": "Read",
@@ -22,7 +22,7 @@
     "https"
   ],
   "paths": {
-    "/address/{address}": {
+    "/address/{address}/{all}": {
       "get": {
         "tags": [
           "Read"
@@ -40,14 +40,106 @@
             "description": "MAM address",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "all",
+            "in": "path",
+            "description": "determin if the api should not only return the package specified by the address, but also return all the packages as the input of this pacakge and the packages as the inputs of these packages and so on. Any value for this parameter means get all packages, if not provided then only the package specified by the address will be returned",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation"
+            "description": "successful operation return an array of the packages"
           },
           "404": {
             "description": "Information is not found from the address"
+          }
+        }
+      }
+    },
+    "/address/channel/{rootAddress}": {
+      "get": {
+        "tags": ["Read"],
+        "summary": "Get all packages in the channel",
+        "description": "Get all packages in the channel",
+        "operationId": "getChannelPackages",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "rootAddress",
+            "in": "path",
+            "description": "the root address of the channel",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation return an array of the packages in the channel"
+          },
+          "404": {
+            "description": "Missing the root address"
+          }
+        }
+      }
+    },
+    "/simulate/{packageType}": {
+      "get": {
+        "tags": ["Write"],
+        "summary": "Write the package to the iota nodes",
+        "description": "Write the package to the iota nodes",
+        "operationId": "writePacakges",
+        "produces": [ "application/json" ],
+        "parameters": [
+          {
+            "name": "seed",
+            "in": "header",
+            "description": "the seed used as the root address of the channel which the package will be appended to ",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "packageType",
+            "in": "path",
+            "description": "the package data formate, it can be 'lightweight' or 'standard'",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "the package data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "value"
+              ],
+              "properties": {
+                "dataPackageId": {
+                  "type": "string",
+                  "description": "the id of the package, if not provided, a guid will be created and use as the id"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "If the package is lightweight, the value will be the data field of the submitted package, otherwise value, package id and timestamp will be combined as a string and use sha256 to generate the hash code which will be saved in the data field of the submitted package. The body json can contain any other fields."
+                },
+                "inputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "the address of the pakcages which are the input to the current package"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "If the package is submitted to the IOTA successfully, then the submitted package will be returned, otherwise will return empty result."
           }
         }
       }
