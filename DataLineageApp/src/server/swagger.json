@@ -86,7 +86,7 @@
       }
     },
     "/simulate/{packageType}": {
-      "get": {
+      "post": {
         "tags": ["Write"],
         "summary": "Write the package to the iota nodes",
         "description": "Write the package to the iota nodes",
