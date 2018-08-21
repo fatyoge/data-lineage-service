@@ -10,11 +10,11 @@
   "tags": [
     {
       "name": "Read",
-      "description": "Read lineage info from tangle"
+      "description": "Read data lineage info from tangle"
     },
     {
       "name": "Write",
-      "description": "Write lineage info to tangle"
+      "description": "Write data lineage info to tangle"
     }
   ],
   "schemes": [
@@ -27,9 +27,9 @@
         "tags": [
           "Read"
         ],
-        "summary": "Get lineage information from an address",
-        "description": "Get lineage information from an address.",
-        "operationId": "getByAddres",
+        "summary": "Get lineage information from a MAM address",
+        "description": "Get lineage information from a MAM address. \n To improve the performance, it always check the cache before query the tangle.Data is cached for two days by default.",
+        "operationId": "getByAddress",
         "produces": [
           "application/json"
         ],
@@ -37,21 +37,22 @@
           {
             "name": "address",
             "in": "path",
-            "description": "MAM address",
+            "description": "MAM address that contains data lineage information",
             "required": true,
             "type": "string"
           },
           {
             "name": "all",
             "in": "path",
-            "description": "determin if the api should not only return the package specified by the address, but also return all the packages as the input of this pacakge and the packages as the inputs of these packages and so on. Any value for this parameter means get all packages, if not provided then only the package specified by the address will be returned",
+            "description": "Optional, determine if the API should return the whole data lineage. \n If \"all\" is provided, it loads the data lineage information from the specified address, **plus** it loads all upper stream address information **recursively** from inputs field. \n If \"all\" is ignored, it **only** loads data lineage information from the specified MAM address. It is a \"lazy load\" that does not load information from inputs field.",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "example":"all"
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation return an array of the packages"
+            "description": "successful loaded the information from the specified address"
           },
           "404": {
             "description": "Information is not found from the address"
@@ -62,22 +63,22 @@
     "/address/channel/{rootAddress}": {
       "get": {
         "tags": ["Read"],
-        "summary": "Get all packages in the channel",
-        "description": "Get all packages in the channel",
-        "operationId": "getChannelPackages",
+        "summary": "Get all data lineage information from channel, by specifying the start root address in that channel",
+        "description": "Get all data lineage information from channel, by specifying the start root address in that channel",
+        "operationId": "getPackagesFromChannel",
         "produces": ["application/json"],
         "parameters": [
           {
             "name": "rootAddress",
             "in": "path",
-            "description": "the root address of the channel",
+            "description": "The start root address in the channel",
             "required": true,
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation return an array of the packages in the channel"
+            "description": "Successfully loaded packages from the channel"
           },
           "404": {
             "description": "Missing the root address"
@@ -85,32 +86,34 @@
         }
       }
     },
-    "/simulate/{packageType}": {
+    "/simulate/{format}": {
       "post": {
         "tags": ["Write"],
-        "summary": "Write the package to the iota nodes",
-        "description": "Write the package to the iota nodes",
-        "operationId": "writePacakges",
+        "summary": "Send the data lineage information to the tangle",
+        "description": "Send the data lineage information to the tangles. It writes a json message into a MAM channel. \n If a channel from the seed already exists, the new message will be inserted into the channel, and linked to the last existing message. \n If it is a new seed, a new channel will be created.",
+        "operationId": "SendLineageInformation",
         "produces": [ "application/json" ],
         "parameters": [
           {
             "name": "seed",
             "in": "header",
-            "description": "the seed used as the root address of the channel which the package will be appended to ",
+            "description": "In order to write into a channel, we must provide the private seed of that channel. If it is a new seed, a new channel will be created.",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "example":"YMWCOSQBLSRYNVAIJURFCVWVGMFCS9UTMQEZMUZKNG9HWOV9BLQIARPEUTOHTDRKWFJDJMJYIWJTBJEDJ"
           },
           {
-            "name": "packageType",
+            "name": "format",
             "in": "path",
-            "description": "the package data formate, it can be 'lightweight' or 'standard'",
+            "description": "The data lineage format, it is either 'lightweight' or 'standard'. \n **lightweight**: the value (data package content) will be saved as clear text in MAM message. \n **standard**: In stead of saving the clear text data content, a hash value will be stored  in the MAM message. The hash value is computed as sha256(packageId, value, timestamp).",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "enum": ["lightweight", "standard"]
           },
           {
             "in": "body",
             "name": "body",
-            "description": "the package data",
+            "description": "the lineage information",
             "required": true,
             "schema": {
               "type": "object",
@@ -120,26 +123,98 @@
               "properties": {
                 "dataPackageId": {
                   "type": "string",
-                  "description": "the id of the package, if not provided, a guid will be created and use as the id"
+                  "description": "Optional. The id of the data package, if not provided, the server side generates a GUID for it",
+                  "example":"123-456-789"
                 },
                 "value": {
                   "type": "string",
-                  "description": "If the package is lightweight, the value will be the data field of the submitted package, otherwise value, package id and timestamp will be combined as a string and use sha256 to generate the hash code which will be saved in the data field of the submitted package. The body json can contain any other fields."
+                  "description": "Mandatory, the content of the data package.",
+                  "example":"20°C"
                 },
                 "inputs": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "the address of the pakcages which are the input to the current package"
-                  }
+                    "description": "Optional. The address of the package which are the input to the current package"
+                  },
+                  "example":["MAM_address_1", "MAM_address_2"]
+                },
+                "ownerMetadata": {
+                  "type": "string",
+                  "description": "Optional, the information about the data source. It will be shown on the data lineage viewer diagram",
+                  "example":"Veracity sensor #001"
+                },
+                "operation": {
+                  "type": "string",
+                  "description": "Optional, the information about what kind of operation was done, based on the inputs. It will be shown on the data lineage viewer diagram",
+                  "example":"Integration"
                 }
+
+              },
+              "additionalProperties":{
+                "type":"string"
               }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "If the package is submitted to the IOTA successfully, then the submitted package will be returned, otherwise will return empty result."
+            "description": "If the data was submitted to the tangle is successfully. A json object is created, stored in a MAM message in the channel and returned. \n The json object contains the following fields: \n - mamAddress: the address that stores this message. \n - nextRootAddress: the next available address in the channel. \n - timestamp: server side timestamp. \n - data/signature: based on the format, either 'data' or 'signature' will be created and stored in the MAM message. \n -- lightweight format: field name = 'data', value = Data package content in clear text. \n -- standard format: field name = 'signature', value = Hash of several fields from the request. The hash value is computed on the server side. \n - and, copy of all fields (except 'value' field) from request." ,
+            "schema":{
+              "type": "object",
+              "properties": {
+                "mamAddress": {
+                  "type": "number",
+                  "description": "MAM address of the submitted data",
+                  "example":"QKT9J...XPGLYV"
+                },
+                "nextRootAddress": {
+                  "type": "number",
+                  "description": "The next MAM address in the channel",
+                  "example":"OTZDS...HB9WE9K"
+                },
+                "timestamp": {
+                  "type": "number",
+                  "description": "Server side generated timestamp",
+                  "example":"1532956645935"
+                },
+                "data": {
+                  "type": "string",
+                  "description": "data package content in clear text, when it is using lightweight format",
+                  "example":"20°C"
+                },
+                "signature": {
+                  "type": "string",
+                  "description": "hash, based on the request, when it is using standard format",
+                  "example":"8c20f3d24...43a6cfb7c4"
+                },
+                "dataPackageId": {
+                  "type": "string",
+                  "description": "specified id from request, or generated by server side",
+                  "example":"123-456-789"
+                },
+                "inputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The address of the package which are the input to the current package"  
+                  },
+                  "example":["MAM_address_1", "MAM_address_2"]
+                },                "ownerMetadata": {
+                  "type": "string",
+                  "description": "Copy from request",
+                  "example":"Veracity sensor #001"
+                },
+                "operation": {
+                  "type": "string",
+                  "description": "Copy from request",
+                  "example":"Integration"
+                }
+              },
+              "additionalProperties":{
+                "type":"string"
+              }
+            }
           }
         }
       }

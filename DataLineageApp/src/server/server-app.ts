@@ -32,7 +32,7 @@ app.use("/simulate", simulate.routerUI);
 app.use("/api/address", address);
 app.use("/api/simulate", simulate.routerApi);
 
-//swaager
+//swagger
 var swaggerUi = require('swagger-ui-express'),
     swaggerDocument = require('./swagger.json');
 
