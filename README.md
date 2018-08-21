@@ -15,17 +15,19 @@ The demo application is connecting to the IOTA Mainnet, by using the following n
 ## Functionalities
 ### Lineage viewer
 This application can visualize the data lineage information, such as input/output, owner information, etc.
-
 ### Publish data to tangle
 This application also provide user friendly interface for publishing data to tangle. Since these simulators do talk to IOTA mainnet, you can use them to write into tangle that will be available for all iota users.
 1. Publish data integrity information
 2. Publish data lineage information
 
-## API
+## APIs
 all functionalities are exposed as APIs. 
 The detailed API documentation can be found at http://datalineage-viewer.azurewebsites.net/swagger/ 
 
 ## Technical details
+### Architect
+![Architect](https://github.com/veracity/DataLineage-Viewer/blob/master/Doc/System%20architect.png?raw=true)
+
 This application is using the official IOTA MAM library https://github.com/iotaledger/mam.client.js for interacting with IOTA tangle. Besides, it is based on Nodejs and Typescript for both frontend and server side.
 
 ### Connect to IOTA network
