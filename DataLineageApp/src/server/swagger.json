@@ -218,6 +218,113 @@
           }
         }
       }
+    },
+    "/publish" : {
+      "post" : {
+        "tags" : [ "Write" ],
+        "summary" : "publishData",
+        "description" : "save the data package in json format to the block chain",
+        "operationId" : "publishJsonData",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+                "$ref": "#/definitions/DatalineageLightweightFormat"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The package is successfully saved",
+            "schema" : {
+              {
+                "$ref": "#/definitions/DatalineageStandxardFormat"
+              }
+            }
+          },
+          "400" : {
+            "description" : "The pacakge is not of a valid format",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "error" : {
+                  "type" : "string",
+                  "description" : "the error message"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Can save the package to the block chian"
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "DatalineageLightweightFormat" : {
+      "type" : "object",
+      "required" : [ "datapackageId", "formatType","data" ],
+      "properties" : {
+        "datapackageId": {
+          "type": "string",
+          "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
+          "example": "5538c5d5-2454-4457-ac84-0bd8145f5058"
+        },
+        "formatType" : {
+          "type" : "string",
+          "description" : "The format of the data lineage information package. It should be lightweight",
+          "enum" : [ "lightweight"],
+          "example" : "lightweight"
+        },
+        "data" : {
+          "type" : "string",
+          "description" : "The content of the data package, in clear text"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The address of the package which are the input to the current package"  
+          },
+          "example":["MAM_address_1", "MAM_address_2"]
+        },
+        "signature" : {
+          "type" : "string",
+          "description" : "hash(package-id, data content, timestamp), only when formatType is standard, it is required"
+        }
+      }
+    },
+    "DatalineageStandardFormat" : {
+      "type" : "object",
+      "required" : [ "datapackageId", "formatType","data" ],
+      "properties" : {
+        "datapackageId": {
+          "type": "string",
+          "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
+          "example": "5538c5d5-2454-4457-ac84-0bd8145f5058"
+        },
+        "formatType" : {
+          "type" : "string",
+          "description" : "The format of the data lineage information package. It should be standard",
+          "enum" : [ "standard"],
+          "example" : "standard"
+        },
+        "signature" : {
+          "type" : "string",
+          "description" : "The hash value of the data package and its metadata."
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The address of the package which are the input to the current package"  
+          },
+          "example":["MAM_address_1", "MAM_address_2"]
+        }
+      }
     }
   }
 }
