@@ -223,107 +223,95 @@
     "/publish" : {
       "post" : {
         "tags" : [ "Write" ],
-        "summary" : "publishData",
-        "description" : "save the data package in json format to the block chain",
-        "operationId" : "publishJsonData",
+        "summary" : "publish data lineage information",
+        "description" : "Publish data lineage information into tangle. It verifies the schema, then publish to tangle without any modification.",
+        "operationId" : "PublishLineageInfo",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
-        "parameters" : [ {
+        "parameters" : [ 
+          {
+            "name": "seed",
+            "in": "header",
+            "description": "In order to write into a channel, we must provide the private seed of that channel. If it is a new seed, a new channel will be created.",
+            "required": true,
+            "type": "string",
+            "example":"YMWCOSQBLSRYNVAIJURFCVWVGMFCS9UTMQEZMUZKNG9HWOV9BLQIARPEUTOHTDRKWFJDJMJYIWJTBJEDJ"
+          },
+          {
           "name" : "body",
           "in" : "body",
           "required" : true,
           "schema" : {
-                "$ref": "#/definitions/DatalineageLightweightFormat"
+              "$ref": "#/definitions/DatalineageInfo"
           }
         } ],
         "responses" : {
           "200" : {
-            "description" : "The package is successfully saved",
+            "description" : "The data lineage info was published successfully.",
             "schema" : {
-                "$ref": "#/definitions/DatalineageStandxardFormat"
+                "$ref": "#/definitions/ReturnedDataLineageInfoWithAddress"
               }
+            },
+            "400" : {
+              "description" : "The data lineage info object has an invalid schema."
+            },
+            "500" : {
+              "description" : "Publish failed due to internal error."
             }
-          },
-          "400" : {
-            "description" : "The request is not an valid format",
-            "schema" : {
-              "type" : "object",
-              "properties" : {
-                "error" : {
-                  "type" : "string",
-                  "description" : "the error message"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Can save the package to the tangle."
           }
         }
       }
     },
   "definitions" : {
-    "DatalineageLightweightFormat" : {
+    "DatalineageInfo" : {
       "type" : "object",
-      "required" : [ "datapackageId", "formatType","data" ],
+      "required" : [ "datapackageId", "wayOfProof","valueOfProof" ],
       "properties" : {
         "datapackageId": {
           "type": "string",
           "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
-          "example": "5538c5d5-2454-4457-ac84-0bd8145f5058"
+          "example": "123456"
         },
-        "formatType" : {
+        "wayOfProof" : {
           "type" : "string",
-          "description" : "The format of the data lineage information package. It should be lightweight",
-          "enum" : [ "lightweight"],
-          "example" : "lightweight"
+          "description" : "This field describes how to verify the integrity based on valueOfProof. For example, it explains the used hash algorithms (SHA1 or SHA2 or others), or it simply copied the data package content into field valueOfProof.",
+          "example" : "SHA256(packageId, original-data-content, timestamp)"
         },
-        "data" : {
+        "valueOfProof" : {
           "type" : "string",
-          "description" : "The content of the data package, in clear text"
+          "description" : "The value of the proof, such as hash value, or the copy of the data content in clear text.",
+          "example":"8c20f3d24...43a6cfb7c4"
         },
         "inputs": {
           "type": "array",
           "items": {
             "type": "string",
-            "description": "The address of the package which are the input to the current package"  
+            "description": "The current package might have inputs. If yes, all input package addresses are provided in an array."  
           },
           "example":["MAM_address_1", "MAM_address_2"]
-        },
-        "signature" : {
-          "type" : "string",
-          "description" : "hash(package-id, data content, timestamp), only when formatType is standard, it is required"
         }
       }
     },
-    "DatalineageStandardFormat" : {
-      "type" : "object",
-      "required" : [ "datapackageId", "formatType","data" ],
-      "properties" : {
-        "datapackageId": {
-          "type": "string",
-          "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
-          "example": "5538c5d5-2454-4457-ac84-0bd8145f5058"
+    "ReturnedDataLineageInfoWithAddress" : {
+      "allOf":[
+        {
+         "$ref": "#/definitions/DatalineageInfo"
         },
-        "formatType" : {
-          "type" : "string",
-          "description" : "The format of the data lineage information package. It should be standard",
-          "enum" : [ "standard"],
-          "example" : "standard"
-        },
-        "signature" : {
-          "type" : "string",
-          "description" : "The hash value of the data package and its metadata."
-        },
-        "inputs": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "description": "The address of the package which are the input to the current package"  
-          },
-          "example":["MAM_address_1", "MAM_address_2"]
-        }
-      }
+        {
+          "type":"object",
+          "properties":{
+            "mamAddress": {
+              "type": "number",
+              "description": "MAM address of the submitted data",
+              "example":"QKT9J...XPGLYV"
+            },
+            "nextRootAddress": {
+              "type": "number",
+              "description": "The next MAM address in the channel",
+              "example":"OTZDS...HB9WE9K"
+            }
+          }
+        }]     
     }
   }
 }
