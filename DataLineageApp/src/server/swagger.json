@@ -200,7 +200,8 @@
                     "description": "The address of the package which are the input to the current package"  
                   },
                   "example":["MAM_address_1", "MAM_address_2"]
-                },                "ownerMetadata": {
+                },                
+                "ownerMetadata": {
                   "type": "string",
                   "description": "Copy from request",
                   "example":"Veracity sensor #001"
@@ -239,13 +240,12 @@
           "200" : {
             "description" : "The package is successfully saved",
             "schema" : {
-              {
                 "$ref": "#/definitions/DatalineageStandxardFormat"
               }
             }
           },
           "400" : {
-            "description" : "The pacakge is not of a valid format",
+            "description" : "The request is not an valid format",
             "schema" : {
               "type" : "object",
               "properties" : {
@@ -257,12 +257,11 @@
             }
           },
           "500" : {
-            "description" : "Can save the package to the block chian"
+            "description" : "Can save the package to the tangle."
           }
         }
       }
-    }
-  },
+    },
   "definitions" : {
     "DatalineageLightweightFormat" : {
       "type" : "object",
