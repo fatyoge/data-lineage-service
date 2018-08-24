@@ -200,7 +200,8 @@
                     "description": "The address of the package which are the input to the current package"  
                   },
                   "example":["MAM_address_1", "MAM_address_2"]
-                },                "ownerMetadata": {
+                },                
+                "ownerMetadata": {
                   "type": "string",
                   "description": "Copy from request",
                   "example":"Veracity sensor #001"
@@ -218,6 +219,99 @@
           }
         }
       }
+    },
+    "/publish" : {
+      "post" : {
+        "tags" : [ "Write" ],
+        "summary" : "publish data lineage information",
+        "description" : "Publish data lineage information into tangle. It verifies the schema, then publish to tangle without any modification.",
+        "operationId" : "PublishLineageInfo",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ 
+          {
+            "name": "seed",
+            "in": "header",
+            "description": "In order to write into a channel, we must provide the private seed of that channel. If it is a new seed, a new channel will be created.",
+            "required": true,
+            "type": "string",
+            "example":"YMWCOSQBLSRYNVAIJURFCVWVGMFCS9UTMQEZMUZKNG9HWOV9BLQIARPEUTOHTDRKWFJDJMJYIWJTBJEDJ"
+          },
+          {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+              "$ref": "#/definitions/DatalineageInfo"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The data lineage info was published successfully.",
+            "schema" : {
+                "$ref": "#/definitions/ReturnedDataLineageInfoWithAddress"
+              }
+            },
+            "400" : {
+              "description" : "The data lineage info object has an invalid schema."
+            },
+            "500" : {
+              "description" : "Publish failed due to internal error."
+            }
+          }
+        }
+      }
+    },
+  "definitions" : {
+    "DatalineageInfo" : {
+      "type" : "object",
+      "required" : [ "datapackageId", "wayOfProof","valueOfProof" ],
+      "properties" : {
+        "datapackageId": {
+          "type": "string",
+          "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
+          "example": "123456"
+        },
+        "wayOfProof" : {
+          "type" : "string",
+          "description" : "This field describes how to verify the integrity based on valueOfProof. For example, it explains the used hash algorithms (SHA1 or SHA2 or others), or it simply copied the data package content into field valueOfProof.",
+          "example" : "SHA256(packageId, original-data-content, timestamp)"
+        },
+        "valueOfProof" : {
+          "type" : "string",
+          "description" : "The value of the proof, such as hash value, or the copy of the data content in clear text.",
+          "example":"8c20f3d24...43a6cfb7c4"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The current package might have inputs. If yes, all input package addresses are provided in an array."  
+          },
+          "example":["MAM_address_1", "MAM_address_2"]
+        }
+      }
+    },
+    "ReturnedDataLineageInfoWithAddress" : {
+      "allOf":[
+        {
+         "$ref": "#/definitions/DatalineageInfo"
+        },
+        {
+          "type":"object",
+          "properties":{
+            "mamAddress": {
+              "type": "number",
+              "description": "MAM address of the submitted data",
+              "example":"QKT9J...XPGLYV"
+            },
+            "nextRootAddress": {
+              "type": "number",
+              "description": "The next MAM address in the channel",
+              "example":"OTZDS...HB9WE9K"
+            }
+          }
+        }]     
     }
   }
 }
