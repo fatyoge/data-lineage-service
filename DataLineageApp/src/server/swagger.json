@@ -89,7 +89,7 @@
     "/simulate/{format}": {
       "post": {
         "tags": ["Write"],
-        "summary": "Send the data lineage information to the tangle",
+        "summary": "Send the data lineage information to the tangle (To be updated)",
         "description": "Send the data lineage information to the tangles. It writes a json object into a MAM message and stores in the channel. \n If a channel from the seed already exists, the new message will be inserted into the channel, and linked to the last existing message. \n If it is a new seed, a new channel will be created.\nAs IOTA MAM SDK doesn't support for directly getting the last available address from the channel, the api locate the last address by scanning on the message chain in the channel. Then the API cache the mam status and last address for next submit.",
         "operationId": "SendLineageInformation",
         "produces": [ "application/json" ],
