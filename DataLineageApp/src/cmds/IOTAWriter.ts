@@ -1,6 +1,7 @@
 ﻿import IOTA = require("iota.lib.js");
 import * as Mam from "../../../mam.client.js/lib/mam.client";
 import Utilities from "../common/utilities";
+import { IDataPackage } from "../server/data-package";
 
 export interface IIOTAWriterJsonData {
     iotaProvider: string;
@@ -88,7 +89,7 @@ export default class IOTAWriter {
      * @returns if success, renturn the address of the package and the next root address in the same channel, otherwise return undefined
      * @param newPackage
      */
-    public async attachNew(newPackage): Promise<{ address: string; nextRoot: string } | undefined> {
+    public async attachNew(newPackage: IDataPackage): Promise<{ address: string; nextRoot: string } | undefined> {
         try {
             await this.initLastMamState();
         } catch (e) {

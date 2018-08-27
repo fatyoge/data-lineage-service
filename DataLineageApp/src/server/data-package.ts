@@ -12,6 +12,8 @@
      * Next root address in the same channel
      */
     nextRootAddress: string;
+    wayofProof: string;
+    valueOfProof: string;
     /*
      * The address of MAM for each input of the data package
      */
@@ -20,32 +22,13 @@
     ownerMetadata?: any;
 }
 
-export interface ILightweightPackage extends IDataPackage {
-    data: any;
-}
-
-export interface IStandardPackage extends IDataPackage {
-    signature: string;
-}
 
 export class PacakgeHelper {
-    static isLightWeight(pkg: IDataPackage): pkg is ILightweightPackage {
-        if ("data" in pkg) {
-            return true;
-        }
-        return false;
-    }
-
-    static isStandard(pkg: IDataPackage): pkg is IStandardPackage {
-        if ("signature" in pkg) {
-            return true;
-        }
-        return false;
-    }
-
     static isRealPackage(pkg: IDataPackage): boolean {
         return typeof pkg.inputs !== "undefined" ||
             typeof pkg.dataPackageId !== "undefined" ||
             typeof pkg.timestamp !== "undefined";
     }
+    static readonly PROOF_VALUE = "copy of original data";
+    static readonly PROOF_STANDARD = "sha256(packageId, value, timestamp)";
 }

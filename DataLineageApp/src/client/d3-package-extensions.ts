@@ -1,11 +1,11 @@
 ﻿import * as d3 from "d3";
 import * as bootstrap from "bootstrap";
 
-import { IDataPackage, ILightweightPackage, IStandardPackage } from "../server/data-package";
+import { IDataPackage } from "../server/data-package";
 import dataOperations, {DataOperationCategory} from "./process-operation";
 
 
-export function packageDescriptionHtml(pkg: IDataPackage | ILightweightPackage | IStandardPackage): string {
+export function packageDescriptionHtml(pkg: IDataPackage): string {
     let listContent = "";
     let hasOpertaion = false;
     if (pkg) {
