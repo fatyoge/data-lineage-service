@@ -92,6 +92,10 @@ router
                 break;
             }
         }
+        if (allPacakges.length <= 0) {
+            res.status(404).end(`Can't find any packages with the address ${rootAddress}`);
+            return;
+        }
         res.json(allPacakges);
     })
  /* GET package information by address api
@@ -116,7 +120,10 @@ router
                 }
             }
         }
-
+        if (allPacakges.length <= 0) {
+            res.status(404).end(`Can't find any packages with the address ${fetchAddresses}`);
+            return;
+        }
         res.json(allPacakges);
     });
 

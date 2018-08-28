@@ -49,7 +49,12 @@ class App {
             return result;
         } catch (e) {
             $(alertId).hide();
-            throw e;
+            console.error(`fetach package with address ${address} get error ${e}`);
+            if (e.status === 404) {
+                return [];
+            } else {
+                throw e;
+            }
         }
     }
 
