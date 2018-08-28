@@ -87,7 +87,7 @@ routerApi.post("/",
     async (req, res) => {
         const seed = req.headers["seed"] as string;
         if (typeof seed !== "string") {
-            res.end(400);
+            res.status(400).end("missing seed header");
             return;
         }
         const result = await writeData(seed, req.body);

@@ -95,8 +95,10 @@ export default class IOTAWriter {
         } catch (e) {
             console.error(`check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`);
             return undefined;
-        } 
-        
+        }
+        if (!newPackage.dataPackageId || !newPackage.wayofProof || !newPackage.valueOfProof) {
+            throw new Error("dataPackageId, wayofProof and valueOfProof are required, please make sure you have the three fileds");
+        }
         const json = JSON.stringify(newPackage);
         console.log(`submitting new package ${json} ...`);
         // Create Trytes

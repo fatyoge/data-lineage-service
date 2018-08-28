@@ -1,7 +1,6 @@
 ﻿import * as express from "express";
 import config from "../server-config";
 import { IDataPackage } from "../data-package";
-import { packageCache } from "../server-global-cache";
 import IOTAReader from "../../cmds/IOTAReader";
 
 const router = express.Router();
