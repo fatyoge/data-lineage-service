@@ -30,5 +30,5 @@ export class PacakgeHelper {
             typeof pkg.timestamp !== "undefined";
     }
     static readonly PROOF_VALUE = "copy of original data";
-    static readonly PROOF_STANDARD = "sha256(packageId, value, timestamp)";
+    static readonly PROOF_STANDARD = "sha256(packageid, value, timestamp)";
 }
