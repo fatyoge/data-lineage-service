@@ -16,11 +16,10 @@ export default class IOTAWriter {
 
     constructor(private readonly _iotaProvider: string, private readonly _seed?: string, lastUsedAddress?: string) {
         if (!_seed) {
-            console.log("seed is not provided, random generate it.");
-            this._seed = Utilities.randomSeed();
+            console.log("seed is not provided");
+            throw new Error("seed is missing")
         }
-        console.log(`seed is ${this._seed}`);
-        console.log(`using provider ${_iotaProvider} for package attaching`);
+        console.log(`Creating IOTA writer with provider:  ${_iotaProvider}`);
         this._iota = new IOTA({ provider: _iotaProvider });
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
@@ -40,19 +39,19 @@ export default class IOTAWriter {
     }
 
     /**
-     * make sure the _lastMamState represend to the last pos of the attached node in the channel, so that the new add node can be attached successfully
+     * make sure the _lastMamState represent the last address of the attached node in the channel, so that the new add node can be attached successfully
      */
     private async initLastMamState(): Promise<void> {
         if (this._lastMamState) {
             return;
         }
-        console.log("finding last node in the channel...");
+        console.log("Searching the last used address in the channel...");
         let mamState = Mam.init(this._iota, this._seed);
         //as the seed may already exist, and after Mam.init, mamState always points to the root of the channel, we need to make mamState point to the last
         let rootAddress = Mam.getRoot(mamState);
         let preAddress: string | undefined = undefined; //if keep undefined, means 
 
-        //if we alrady know the last used address, jump to it directly
+        //if we already know the last used address, jump to it directly
         if (this._lastUsedAddress) {
             rootAddress = this._lastUsedAddress;
             preAddress = this._lastUsedAddress;
@@ -71,22 +70,21 @@ export default class IOTAWriter {
             this._lastUsedAddress = preAddress;
         }
         let message: { payload: string, address: string, state: any };
-        //loop until message is point to the last attahced node
+        //loop until message is point to the last attached node
         //if preAddress not defined, means the channel is empty (previous "while" loop stopped at used check for the first time)
         while (preAddress) {
-            console.log(`update mam state to point to last used address`);
-            message = Mam.create(mamState, this._iota.utils.toTrytes(JSON.stringify({ "data":"This is a fake messaget to find last" })));
+            message = Mam.create(mamState, this._iota.utils.toTrytes(JSON.stringify({ "data":"This is a fake message to find last address" })));
             if (message.address === preAddress) {
                 break;
             }
             mamState = message.state;
         }
-        console.log(`finish updateing mam state to last used address of seed ${this._seed}`);
+        console.log(`Updated MAM client state to last used address of seed: ${(this._seed as string).substring(0, 5)}...`);
         this._lastMamState = mamState;
     }
 
     /**
-     * @returns if success, renturn the address of the package and the next root address in the same channel, otherwise return undefined
+     * @returns if success, return the address of the package and the next root address in the same channel, otherwise return undefined
      * @param newPackage
      */
     public async attachNew(newPackage: IDataPackage): Promise<{ address: string; nextRoot: string } | undefined> {
@@ -96,32 +94,25 @@ export default class IOTAWriter {
             console.error(`check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`);
             return undefined;
         }
-        if (!newPackage.dataPackageId || !newPackage.wayofProof || !newPackage.valueOfProof) {
-            throw new Error("dataPackageId, wayofProof and valueOfProof are required, please make sure you have the three fileds");
-        }
         const json = JSON.stringify(newPackage);
         console.log(`submitting new package ${json} ...`);
         // Create Trytes
         const trytes = this._iota.utils.toTrytes(json);
         if (!trytes) {
-            console.error(`itoa library can't convert the json string ${json} to trytes string`);
+            console.error(`MAM library can't convert the json string ${json} to trytes string`);
             return undefined;
         }
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
-        
-        try {
-            // Attach the payload.
-            await Mam.attach(message.payload, message.address);
-            // update mamState as new mamState
-            this._lastMamState = message.state;
-            this._lastUsedAddress = message.address;
-            console.log(`package ${json} is submitted, the address is ${message.address}`);
-            return { address: message.address, nextRoot: message.state.channel.next_root };
-        } catch (e) {
-            console.error(`submitting package ${json} failed, the error is ${JSON.stringify(e)}`);
-            return undefined;
-        }
+
+        // Attach the payload.
+        await Mam.attach(message.payload, message.address);
+        // update mamState as new mamState
+        this._lastMamState = message.state;
+        this._lastUsedAddress = message.address;
+        console.log(`package ${json} is submitted, the address is ${message.address}`);
+        return { address: message.address, nextRoot: message.state.channel.next_root };
+
     }
 
 }

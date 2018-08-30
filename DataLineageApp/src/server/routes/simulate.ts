@@ -3,7 +3,7 @@ import uuid = require("uuid/v4");
 import crypto = require("crypto");
 import IOTAWriter from "../../cmds/IOTAWriter";
 import serverConfig from "../server-config";
-import { IDataPackage, PacakgeHelper } from "../data-package";
+import { IDataPackage, PackageHelper } from "../data-package";
 import { writersCache } from "../server-global-cache";
 const routerUI = express.Router();
 const routerApi = express.Router();
@@ -19,7 +19,7 @@ routerUI.get("/processor", (req, res) => {
 
 interface IPackageSubmitData {
     inputs?: string[];
-    wayofProof: string;
+    wayOfProof: string;
     value;
     dataPackageId?: string;
 }
@@ -31,8 +31,8 @@ async function writeData(seed: string, data: IPackageSubmitData): Promise<IDataP
         writer = new IOTAWriter(serverConfig.iotaProviders[0], seed);
         writersCache.set(seed, writer);
     }
-    if (!data.wayofProof) {
-        const error = "package data missing required field 'wayofProof'"
+    if (!data.wayOfProof) {
+        const error = "package data missing required field 'wayOfProof'"
         console.error(error);
         return error;
     }
@@ -44,18 +44,18 @@ async function writeData(seed: string, data: IPackageSubmitData): Promise<IDataP
     } as any;
     //value is added by ...data
     delete (pkg as any).value;
-    switch (pkg.wayofProof.toLowerCase()) {
-    case PacakgeHelper.PROOF_STANDARD:
+    switch (pkg.wayOfProof.toLowerCase()) {
+    case PackageHelper.PROOF_STANDARD:
         pkg.valueOfProof =
             crypto.createHash("sha256")
             .update(`${pkg.dataPackageId} ${data.value} ${pkg.timestamp}`)
             .digest("hex");
         break;
-    case PacakgeHelper.PROOF_VALUE:
+    case PackageHelper.PROOF_VALUE:
         pkg.valueOfProof = data.value;
         break;
     default:
-        return `unknown wayofProof ${pkg.wayofProof}`;
+        return `unknown wayOfProof ${pkg.wayOfProof}`;
     }
     delete pkg.mamAddress;
     delete pkg.nextRootAddress;
@@ -66,13 +66,13 @@ async function writeData(seed: string, data: IPackageSubmitData): Promise<IDataP
             pkg.nextRootAddress = attachResult.nextRoot;
         }
     } catch (e) {
-        const error = `failed to attach the pacakge ${JSON.stringify(pkg)} with seed ${seed}, the exception is ${e}`;
+        const error = `failed to attach the package ${JSON.stringify(pkg)} with seed: ${seed.substring(0,5)}..., the exception is ${e}`;
         console.error(error);
         return error;
     }
     
     if (!pkg.mamAddress) {
-        const error = `failed to attach the pacakge ${JSON.stringify(pkg)} with seed ${seed}`;
+        const error = `failed to attach the package ${JSON.stringify(pkg)} with seed: ${seed.substring(0,5)}...`;
         console.error(error);
         return error;
     }

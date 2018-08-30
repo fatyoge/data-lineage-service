@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { drawConfig, packageDescriptionHtml } from "./d3-package-extensions";
 
 import { IDataPackage } from "../server/data-package";
-import { PacakgesCollection } from "./packages-collection";
+import { PackagesCollection } from "./packages-collection";
 import dataOperations, { DataOperationCategory, DataOperation } from "./process-operation";
 
 interface IPackageTreeData {
@@ -28,11 +28,11 @@ class App {
     private _svg: d3.Selection<HTMLElement, any, any, any>;
     private _treemap: d3.TreeLayout<IPackageTreeData>;
     private _nodesData: d3.HierarchyNode<IPackageTreeData>|undefined;
-    private readonly _packages: PacakgesCollection<IDataPackage>;
+    private readonly _packages: PackagesCollection<IDataPackage>;
     private _rootPkgAddress: string;
 
     constructor(private readonly _svgId: string) {
-        this._packages = new PacakgesCollection(drawConfig.colorSeries);
+        this._packages = new PackagesCollection(drawConfig.colorSeries);
         this.reset();
     }
 
@@ -49,7 +49,7 @@ class App {
             return result;
         } catch (e) {
             $(alertId).hide();
-            console.error(`fetach package with address ${address} get error ${e}`);
+            console.error(`fetch package with address ${address} get error ${e}`);
             if (e.status === 404) {
                 return [];
             } else {
@@ -151,7 +151,7 @@ class App {
             .attr("class", "package")
         //although we enable css for r, but css for svg shape is supported only by chrome, so we need to explict set this again for making it work on Edge and firfox
             .attr("r", drawConfig.nodeRadius)
-            .attr("fill", d => this._packages.pacakgeColor(d.data.data.mamAddress) as string);
+            .attr("fill", d => this._packages.packageColor(d.data.data.mamAddress) as string);
 
         
         node.each((d, index: number, nodes: Element[]) => {

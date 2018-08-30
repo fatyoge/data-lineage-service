@@ -1,6 +1,6 @@
-﻿import {IDataPackage, PacakgeHelper } from "../server/data-package";
+﻿import {IDataPackage, PackageHelper } from "../server/data-package";
 
-export class PacakgesCollection<TPackage extends IDataPackage> {
+export class PackagesCollection<TPackage extends IDataPackage> {
     private _packages: TPackage[];
     /**
      * used as a quick dict for looking the package index in this._packages
@@ -13,13 +13,13 @@ export class PacakgesCollection<TPackage extends IDataPackage> {
     }
 
     private static isRealPackage(pkg: IDataPackage): boolean {
-        return PacakgeHelper.isRealPackage(pkg);
+        return PackageHelper.isRealPackage(pkg);
     }
 
     addOrUpdate(pkg: TPackage): void {
         if (this.packageExist(pkg.mamAddress, false)) {
-            //we only upldate when pkg is a real pacakge data
-            if (!PacakgesCollection.isRealPackage(pkg)) return;
+            //we only update when pkg is a real package data
+            if (!PackagesCollection.isRealPackage(pkg)) return;
             this._packages[this._packagesIndex[pkg.mamAddress]] = pkg;
         } else {
             this._packages.push(pkg);
@@ -28,9 +28,9 @@ export class PacakgesCollection<TPackage extends IDataPackage> {
     }
 
     /**
-     * the collection not only contains the real pacakge, but also contains package from inputs (i.e. package only has mamAddress no other fields)
+     * the collection not only contains the real package, but also contains package from inputs (i.e. package only has mamAddress no other fields)
      * @param pkgAddress
-     * @param onlyRealPkg, if true, means only a pakcage with other fields is think as the real and only this kind of package exist then the fucntion will return true
+     * @param onlyRealPkg, if true, means only a package with other fields is think as the real and only this kind of package exist then the function will return true
      * if false, then as long as an package with mamAddress same as the pkgAddress, then function will return true
      */
     packageExist(pkgAddress: string, onlyRealPkg: boolean = true): boolean {
@@ -38,7 +38,7 @@ export class PacakgesCollection<TPackage extends IDataPackage> {
         if (typeof this._packagesIndex[pkgAddress] === "undefined") return false;
         const pkg = this._packages[this._packagesIndex[pkgAddress]];
         //has fields so is a real
-        if (PacakgesCollection.isRealPackage(pkg)) {
+        if (PackagesCollection.isRealPackage(pkg)) {
             return true;
         }
         //only has address, is a fake package
@@ -59,7 +59,7 @@ export class PacakgesCollection<TPackage extends IDataPackage> {
     getAllPackages(onlyRealPkg: boolean = true): TPackage[] {
         const result: TPackage[] = [];
         for (let i = 0; i < this._packages.length; i++) {
-            if (!onlyRealPkg || PacakgesCollection.isRealPackage(this._packages[i])) {
+            if (!onlyRealPkg || PackagesCollection.isRealPackage(this._packages[i])) {
                 result.push(this._packages[i]);
             }
         }
@@ -84,7 +84,7 @@ export class PacakgesCollection<TPackage extends IDataPackage> {
         return packages;
     }
 
-    pacakgeColor(pkgAddress: string): string | undefined {
+    packageColor(pkgAddress: string): string | undefined {
         if (this.packageExist(pkgAddress, false)) {
             const index = this._packagesIndex[pkgAddress];
             if (!this._colorsSeries) {

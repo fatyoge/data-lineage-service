@@ -12,7 +12,7 @@
      * Next root address in the same channel
      */
     nextRootAddress: string;
-    wayofProof: string;
+    wayOfProof: string;
     valueOfProof: string;
     /*
      * The address of MAM for each input of the data package
@@ -23,7 +23,7 @@
 }
 
 
-export class PacakgeHelper {
+export class PackageHelper {
     static isRealPackage(pkg: IDataPackage): boolean {
         return typeof pkg.inputs !== "undefined" ||
             typeof pkg.dataPackageId !== "undefined" ||

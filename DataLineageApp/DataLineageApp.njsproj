@@ -121,8 +121,6 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\cmds\IOTAReader.ts" />
     <TypeScriptCompile Include="src\cmds\IOTAWriter.ts" />
-    <TypeScriptCompile Include="src\cmds\mam-cmd.ts" />
-    <TypeScriptCompile Include="src\cmds\simulate.ts" />
     <TypeScriptCompile Include="src\common\utilities.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

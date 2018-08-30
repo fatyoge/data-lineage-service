@@ -3,7 +3,7 @@ import uuid = require("uuid/v4");
 import { SeedInput } from "./seed-input";
 import { LogOutput } from "./log-output";
 import { ChannelPackagesList } from "./channel-packages-list";
-import { IDataPackage, PacakgeHelper } from "../../server/data-package";
+import { IDataPackage, PackageHelper } from "../../server/data-package";
 import dataOperations, { DataOperationCategory, DataOperation } from "../process-operation";
 import Utilities from "../../common/utilities";
 
@@ -93,7 +93,7 @@ export class Publisher extends React.Component<IProp, State> {
             inputs: this.state.packageInputsAddress,
             value: this.state.value,
             dataPackageId: uuid(),
-            wayofProof: this.state.packageType === "lightweight" ? PacakgeHelper.PROOF_VALUE : PacakgeHelper.PROOF_STANDARD
+            wayOfProof: this.state.packageType === "lightweight" ? PackageHelper.PROOF_VALUE : PackageHelper.PROOF_STANDARD
         };
 
         this.state.otherFields.forEach(f => newPkg[f.key] = f.value);

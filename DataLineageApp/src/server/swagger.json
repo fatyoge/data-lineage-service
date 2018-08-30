@@ -86,140 +86,6 @@
         }
       }
     },
-    "/simulate/{format}": {
-      "post": {
-        "tags": ["Write"],
-        "summary": "Send the data lineage information to the tangle (To be updated)",
-        "description": "Send the data lineage information to the tangles. It writes a json object into a MAM message and stores in the channel. \n If a channel from the seed already exists, the new message will be inserted into the channel, and linked to the last existing message. \n If it is a new seed, a new channel will be created.\nAs IOTA MAM SDK doesn't support for directly getting the last available address from the channel, the api locate the last address by scanning on the message chain in the channel. Then the API cache the mam status and last address for next submit.",
-        "operationId": "SendLineageInformation",
-        "produces": [ "application/json" ],
-        "parameters": [
-          {
-            "name": "seed",
-            "in": "header",
-            "description": "In order to write into a channel, we must provide the private seed of that channel. If it is a new seed, a new channel will be created.",
-            "required": true,
-            "type": "string",
-            "example":"YMWCOSQBLSRYNVAIJURFCVWVGMFCS9UTMQEZMUZKNG9HWOV9BLQIARPEUTOHTDRKWFJDJMJYIWJTBJEDJ"
-          },
-          {
-            "name": "format",
-            "in": "path",
-            "description": "The data lineage format, it is either 'lightweight' or 'standard'. \n **lightweight**: the value (data package content) will be saved as clear text in MAM message. \n **standard**: In stead of saving the clear text data content, a hash value will be stored  in the MAM message. The hash value is computed as sha256(packageId, value, timestamp).",
-            "required": true,
-            "type": "string",
-            "enum": ["lightweight", "standard"]
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "description": "the lineage information",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "value"
-              ],
-              "properties": {
-                "dataPackageId": {
-                  "type": "string",
-                  "description": "Optional. The id of the data package, if not provided, the server side generates a GUID for it",
-                  "example":"123-456-789"
-                },
-                "value": {
-                  "type": "string",
-                  "description": "Mandatory, the content of the data package.",
-                  "example":"20°C"
-                },
-                "inputs": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "description": "Optional. The address of the package which are the input to the current package"
-                  },
-                  "example":["MAM_address_1", "MAM_address_2"]
-                },
-                "ownerMetadata": {
-                  "type": "string",
-                  "description": "Optional, the information about the data source. It will be shown on the data lineage viewer diagram",
-                  "example":"Veracity sensor #001"
-                },
-                "operation": {
-                  "type": "string",
-                  "description": "Optional, the information about what kind of operation was done, based on the inputs. It will be shown on the data lineage viewer diagram",
-                  "example":"Integration"
-                }
-
-              },
-              "additionalProperties":{
-                "type":"string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "If the data was submitted to the tangle is successfully. A json object is created, stored in a MAM message in the channel and returned. \n The json object contains the following fields: \n - mamAddress: the address that stores this message. \n - nextRootAddress: the next available address in the channel. \n - timestamp: server side timestamp. \n - data/signature: based on the format, either 'data' or 'signature' will be created and stored in the MAM message. \n -- lightweight format: field name = 'data', value = Data package content in clear text. \n -- standard format: field name = 'signature', value = Hash of several fields from the request. The hash value is computed on the server side. \n - and, copy of all fields (except 'value' field) from request. \n\n If submit failed, an empty result will be returned." ,
-            "schema":{
-              "type": "object",
-              "properties": {
-                "mamAddress": {
-                  "type": "number",
-                  "description": "MAM address of the submitted data",
-                  "example":"QKT9J...XPGLYV"
-                },
-                "nextRootAddress": {
-                  "type": "number",
-                  "description": "The next MAM address in the channel",
-                  "example":"OTZDS...HB9WE9K"
-                },
-                "timestamp": {
-                  "type": "number",
-                  "description": "Server side generated timestamp",
-                  "example":"1532956645935"
-                },
-                "data": {
-                  "type": "string",
-                  "description": "data package content in clear text, when it is using lightweight format",
-                  "example":"20°C"
-                },
-                "signature": {
-                  "type": "string",
-                  "description": "hash, based on the request, when it is using standard format",
-                  "example":"8c20f3d24...43a6cfb7c4"
-                },
-                "dataPackageId": {
-                  "type": "string",
-                  "description": "specified id from request, or generated by server side",
-                  "example":"123-456-789"
-                },
-                "inputs": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "description": "The address of the package which are the input to the current package"  
-                  },
-                  "example":["MAM_address_1", "MAM_address_2"]
-                },                
-                "ownerMetadata": {
-                  "type": "string",
-                  "description": "Copy from request",
-                  "example":"Veracity sensor #001"
-                },
-                "operation": {
-                  "type": "string",
-                  "description": "Copy from request",
-                  "example":"Integration"
-                }
-              },
-              "additionalProperties":{
-                "type":"string"
-              }
-            }
-          }
-        }
-      }
-    },
     "/publish" : {
       "post" : {
         "tags" : [ "Write" ],
@@ -265,9 +131,9 @@
   "definitions" : {
     "DatalineageInfo" : {
       "type" : "object",
-      "required" : [ "datapackageId", "wayOfProof","valueOfProof" ],
+      "required" : [ "dataPackageId", "wayOfProof","valueOfProof" ],
       "properties" : {
-        "datapackageId": {
+        "dataPackageId": {
           "type": "string",
           "description": "Data package ID. This ID will be used for querying the data lineage info from the channel. Data source decides the ID format, such as integer or GUID. Different channels can have the same package ID.",
           "example": "123456"
@@ -290,6 +156,9 @@
           },
           "example":["MAM_address_1", "MAM_address_2"]
         }
+      },
+      "additionalProperties":{
+        "type":"string"
       }
     },
     "ReturnedDataLineageInfoWithAddress" : {

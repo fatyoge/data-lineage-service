@@ -20,21 +20,30 @@ router
                 res.status(400).end("missing request body");
                 return;
             }
+            var newPackage = req.body as IDataPackage
+            if (!newPackage.dataPackageId || !newPackage.wayOfProof || !newPackage.valueOfProof) {
+                res.status(400).end("dataPackageId, wayOfProof and valueOfProof are mandatory. The field name is case sensitive.");
+                return;
+            }
+
             let writer = writersCache.get(seed) as IOTAWriter;
             if (!writer) {
-                console.log(`iota writer is found from cache for seed ${seed}`);
+                console.log(`IOTA writer is NOT found from cache for seed: ${seed.substring(0, 5)}..., create one.`);
                 writer = new IOTAWriter(config.iotaProviders[0], seed);
                 writersCache.set(seed, writer);
             }
             try {
-                const result = await writer.attachNew(req.body as IDataPackage);
-                if (typeof result === "undefined") {
-                    res.status(500).end(`push to block chain failed`);
-                } else if (result.address) {
-                    res.status(200).end(result.address);
+                const reqBody = req.body as IDataPackage;
+                const attachResult = await writer.attachNew(reqBody);
+                if (typeof attachResult === "undefined") {
+                    res.status(500).end(`Failed to publish to the tangle.`);
+                } else if (attachResult.address) {
+                    reqBody.mamAddress = attachResult.address;
+                    reqBody.nextRootAddress = attachResult.nextRoot;
+                    res.status(200).json(reqBody);
                 }
             } catch (e) {
-                res.status(500).end(`push to block chain failed with error ${e}`);
+                res.status(500).end(`Failed to publish to the tangle.Error ${e}`);
             }
         });
 
