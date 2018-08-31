@@ -1,5 +1,5 @@
 ﻿import * as React from "react";
-import { IDataPackage, PacakgeHelper } from "../../server/data-package";
+import { IDataPackage } from "../../server/data-package";
 
 export interface IProp {
     rootAddress: string;
@@ -24,9 +24,7 @@ export class ChannelPackagesList extends React.Component<IProp, State> {
     }
 
     private static getValueOrSignature(pkg: IDataPackage): string {
-        if (PacakgeHelper.isLightWeight(pkg)) return pkg.data;
-        if (PacakgeHelper.isStandard(pkg)) return pkg.signature;
-        return "";
+        return pkg.valueOfProof;
     }
 
     private onSelectChanged(pkg: IDataPackage, event: React.ChangeEvent<HTMLInputElement>) {

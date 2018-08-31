@@ -8,6 +8,7 @@ import bodyParser = require("body-parser");
 import index from "./routes/index";
 import address from "./routes/address";
 import * as simulate from "./routes/simulate";
+import publish from "./routes/publish";
 import config from "./server-config";
 import { initIOServer } from "./socket.io-server";
 
@@ -31,16 +32,17 @@ app.use("/", index);
 app.use("/simulate", simulate.routerUI);
 app.use("/api/address", address);
 app.use("/api/simulate", simulate.routerApi);
+app.use("/api/publish", publish);
 
 //swagger
-var swaggerUi = require('swagger-ui-express'),
-    swaggerDocument = require('./swagger.json');
+var swaggerUi = require("swagger-ui-express"),
+    swaggerDocument = require("./swagger.json");
 
-if (process.env.NODE_ENV === 'development') {
-    swaggerDocument.host="localhost:" + (process.env.PORT || 3000)
-    }
+if (process.env.NODE_ENV === "development") {
+    swaggerDocument.host = "localhost:" + (process.env.PORT || 3000);
+}
 
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 // catch 404 and forward to error handler

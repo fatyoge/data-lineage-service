@@ -22,7 +22,7 @@ export default class IOTAReader {
                     console.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
                     return null;
                 }
-                console.log(`Package of address '${address}' is fetached from provider ${this._iotaProvider}`);
+                console.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
                 return {
                     json: iota.utils.fromTrytes(mamResult.payload),
                     nextRootAddress: mamResult.nextRoot
@@ -34,7 +34,7 @@ export default class IOTAReader {
             });
     }
 
-    async fetchPacakgeInfo(address: string, useCache: boolean = true): Promise<IDataPackage | null> {
+    async fetchPackageInfo(address: string, useCache: boolean = true): Promise<IDataPackage | null> {
         if (!address) {
             return null;
         }
@@ -70,7 +70,7 @@ export default class IOTAReader {
         } catch (e) {
             //ToDo: Log
             console.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} when use provider ${this._iotaProvider}`);
-            //if all not foudn, then will reject, so get the exception
+            //if all not found, then will reject, so get the exception
             //we return an empty object to indicate it no result
             return null;
         }

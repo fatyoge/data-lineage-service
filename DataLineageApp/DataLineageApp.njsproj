@@ -121,8 +121,6 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\cmds\IOTAReader.ts" />
     <TypeScriptCompile Include="src\cmds\IOTAWriter.ts" />
-    <TypeScriptCompile Include="src\cmds\mam-cmd.ts" />
-    <TypeScriptCompile Include="src\cmds\simulate.ts" />
     <TypeScriptCompile Include="src\common\utilities.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -131,6 +129,7 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\server\routes\address.ts" />
+    <TypeScriptCompile Include="src\server\routes\publish.ts" />
     <TypeScriptCompile Include="src\server\routes\simulate.ts" />
     <TypeScriptCompile Include="src\server\server-app.ts" />
     <TypeScriptCompile Include="src\server\server-config.ts">

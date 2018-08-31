@@ -9,7 +9,7 @@ const pkgFileCacheId = "package.cache";
 const writerFileCacheId = "iotaWriter.cache";
 
 export const packageCache = new MemoryFileCacheSingleType<IDataPackage>(config.pacakgeCacheSeconds, true);
-export const writersCache = new MemoryFileCacheSingleType<IOTAWriter>(config.iotaWriterStateCacheSeconds, false); //it's importanted, becasue the writer will update its internal mamstatus to track the last address
+export const writersCache = new MemoryFileCacheSingleType<IOTAWriter>(config.iotaWriterStateCacheSeconds, false); //it's important, because the writer will update its internal MAM status to track the last address
 
 packageCache.loadFromFile(config.dataFolder, pkgFileCacheId);
 writersCache.loadFromFile(config.dataFolder, writerFileCacheId, writer => {

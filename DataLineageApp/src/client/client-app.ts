@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { drawConfig, packageDescriptionHtml } from "./d3-package-extensions";
 
 import { IDataPackage } from "../server/data-package";
-import {PacakgesCollection} from "./packages-collection";
+import {PackagesCollection} from "./packages-collection";
 
 interface INodeData extends d3.SimulationNodeDatum {
     package: IDataPackage;
@@ -40,7 +40,7 @@ class App {
     private _simulation: d3.Simulation<INodeData, ILinkData>;
     private readonly _nodesData: INodeData[];
     private readonly _linksData: ILinkData[];
-    private readonly _packages: PacakgesCollection<IDataPackage>;
+    private readonly _packages: PackagesCollection<IDataPackage>;
     private _nodesAddingHandle: number|undefined;
     /*
      * The nodes that will be added 
@@ -52,7 +52,7 @@ class App {
         this._svg = d3.select(svgSelector);
         this._nodesData = [];
         this._linksData = [];
-        this._packages = new PacakgesCollection(drawConfig.colorSeries);
+        this._packages = new PackagesCollection(drawConfig.colorSeries);
         this.reset();
     }
 
@@ -130,7 +130,7 @@ class App {
         //for new package node, we create cirele and set class as .node and other attributes
         nodesSelection.enter()
             .packageNode<INodeData>(d => d.package,
-                d => this._packages.pacakgeColor(d.package.mamAddress),
+                d => this._packages.packageColor(d.package.mamAddress),
                 undefined /*d => d.package.inputs ? d.package.inputs.map(address => this._packages.pacakgeColor(address)) : []*/)
             //.popover((d: INodeData) => d.package) if enable popover, the removePopover should be enabled also
             .on("click", this.onNodeClicked.bind(this));

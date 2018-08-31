@@ -1,13 +1,12 @@
 ﻿import * as express from "express";
 import config from "../server-config";
 import { IDataPackage } from "../data-package";
-import { packageCache } from "../server-global-cache";
 import IOTAReader from "../../cmds/IOTAReader";
 
 const router = express.Router();
 
 /**
- * wait until one promese resolved or all promise rejected
+ * wait until one promise resolved or all promise rejected
  * @param promises
  */
 function waitAny<T>(promises: Promise<T>[]): Promise<T> {
@@ -52,7 +51,7 @@ function waitAny<T>(promises: Promise<T>[]): Promise<T> {
 }
 
 
-async function fetchPacakgeInfoWithCache(address: string): Promise<IDataPackage | null> {
+async function fetchPackageInfoWithCache(address: string): Promise<IDataPackage | null> {
     if (!address) {
         return null;
     }
@@ -60,7 +59,7 @@ async function fetchPacakgeInfoWithCache(address: string): Promise<IDataPackage 
     for (let i = 0; i < config.iotaProviders.length; i++) {
         const reader = new IOTAReader(config.iotaProviders[i]);
         try {
-            const firstFound = await reader.fetchPacakgeInfo(address, true);
+            const firstFound = await reader.fetchPackageInfo(address, true);
             if (firstFound) return firstFound;
         } catch (e) {
             console.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} from ${config.iotaProviders[i]}`);
@@ -83,7 +82,7 @@ router
             return;
         }
         while (true) {
-            let pkg = await fetchPacakgeInfoWithCache(rootAddress);
+            let pkg = await fetchPackageInfoWithCache(rootAddress);
             if (!pkg) {
                 break;
             }
@@ -92,6 +91,10 @@ router
             if (!rootAddress) {
                 break;
             }
+        }
+        if (allPacakges.length <= 0) {
+            res.status(404).end(`Can't find any packages with the address ${rootAddress}`);
+            return;
         }
         res.json(allPacakges);
     })
@@ -109,7 +112,7 @@ router
         }
         while (fetchAddresses.length > 0) {
             address = fetchAddresses.shift();
-            let pkg = await fetchPacakgeInfoWithCache(address);
+            let pkg = await fetchPackageInfoWithCache(address);
             if (pkg) {
                 allPacakges.push(pkg);
                 if (req.params.all && pkg.inputs && pkg.inputs.length > 0) {
@@ -117,7 +120,10 @@ router
                 }
             }
         }
-
+        if (allPacakges.length <= 0) {
+            res.status(404).end(`Can't find any packages with the address ${fetchAddresses}`);
+            return;
+        }
         res.json(allPacakges);
     });
 
