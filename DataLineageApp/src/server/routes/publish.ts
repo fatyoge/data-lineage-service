@@ -40,7 +40,7 @@ router
                 } else if (attachResult.address) {
                     reqBody.mamAddress = attachResult.address;
                     reqBody.nextRootAddress = attachResult.nextRoot;
-                    res.status(200).json(reqBody);
+                    res.status(200).json(reqBody).end();
                 }
             } catch (e) {
                 res.status(500).end(`Failed to publish to the tangle.Error ${e}`);
