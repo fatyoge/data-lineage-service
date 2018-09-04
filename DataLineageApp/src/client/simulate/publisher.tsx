@@ -6,7 +6,7 @@ import { ChannelPackagesList } from "./channel-packages-list";
 import { IDataPackage, PackageHelper } from "../../server/data-package";
 import dataOperations, { DataOperationCategory, DataOperation } from "../process-operation";
 import Utilities from "../../common/utilities";
-
+import crypto = require("crypto");
 
 
 const lightweight = "lightweight";
@@ -91,8 +91,8 @@ export class Publisher extends React.Component<IProp, State> {
     private createPackage(): IDataPackage {
         const newPkg = {
             inputs: this.state.packageInputsAddress,
-            value: this.state.value,
             dataPackageId: uuid(),
+            timestamp: Date.now(),
             wayOfProof: this.state.packageType === "lightweight" ? PackageHelper.PROOF_VALUE : PackageHelper.PROOF_STANDARD
         };
 
@@ -130,11 +130,11 @@ export class Publisher extends React.Component<IProp, State> {
         if (!hasError) {
             //iota can only put ascii char
             let hasUnicode = false;
-            if (Utilities.containsUnicode(this.state.ownerMetadata)) {
+            if (Utilities.containsUnicode(JSON.stringify(this.createPackage()))) {
                 hasUnicode = true;
             }
             if (!hasUnicode && this.state.packageType === "lightweight") {
-                if (Utilities.containsUnicode(JSON.stringify(this.createPackage()))) {
+                if (Utilities.containsUnicode(this.state.value)) {
                     hasUnicode = true;
                 }
             }
@@ -152,20 +152,38 @@ export class Publisher extends React.Component<IProp, State> {
             return;
         }
         const newPkg = this.createPackage();
+
+        //prepare the package to be a valid package format
+        switch (newPkg.wayOfProof.toLowerCase()) {
+        case PackageHelper.PROOF_STANDARD:
+            newPkg.valueOfProof =
+                crypto.createHash("sha256")
+                .update(`${newPkg.dataPackageId} ${this.state.value} ${newPkg.timestamp}`)
+                .digest("hex");
+            break;
+        case PackageHelper.PROOF_VALUE:
+            newPkg.valueOfProof = this.state.value;
+            break;
+        default:
+            throw Error(`Unknown pacakge format ${newPkg.wayOfProof}`);
+        }
+
         this.log(`Submitting data package with auto-generated package Id: ${newPkg.dataPackageId}`);
+        this.log(`The package being submitted is: \n ${JSON.stringify(newPkg, null, 4)}`);
         this.setState({ isSubmitting: true });
         try {
-            const pkg = await $.ajax(`/api/simulate`,
+            const pkg = await $.ajax(`/api/publish`,
                 {
                     method: "POST",
                     headers: {seed: this.state.seed},
                     data: JSON.stringify(newPkg),
                     contentType: "application/json",
-                    dataType: "json"
+                    dataType: "json",
+                    timeout: 1000*60*10 //change timeout to 5 minuts, as some IOTA node really very slow
                 });
             if (pkg) {
                 this.setState({ value: "", packageInputsAddress: [] });
-                this.log(`Data package is submitted as below: \n ${JSON.stringify(pkg, null, 4)}`);
+                this.log(`Data package is submitted @ address ${pkg.mamAddress}`);
             } else {
                 this.log(`Data package submit failed.`);
             }

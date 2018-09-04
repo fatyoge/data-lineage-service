@@ -122,7 +122,13 @@ export default class IOTAWriter {
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
 
         // Attach the payload.
-        await Mam.attach(message.payload, message.address);
+        const result = await Mam.attach(message.payload, message.address);
+        if (typeof result === "undefined"||typeof (result.length) === "undefined") {
+            //the Mam.attach return caught error, means it failed
+            const err = `MAM library can't attach the package to trytes, the error is ${JSON.stringify(result)}`;
+            console.error(err);
+            return { error: err };
+        }
         // update mamState as new mamState
         this._lastMamState = message.state;
         this._lastUsedAddress = message.address;
