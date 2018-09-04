@@ -9,12 +9,12 @@ export interface IIOTAWriterJsonData {
     lastUsedAddress;
 }
 
-export interface IAttachNewResult {
+export interface IAttachSuccessResult {
     address: string;
     nextRoot: string;
 }
 
-export interface IAttachNewErrorResult {
+export interface IAttachFailedResult {
     error: string ;
 }
 
@@ -96,7 +96,7 @@ export default class IOTAWriter {
      * @returns if success, return the address of the package and the next root address in the same channel, otherwise return undefined
      * @param newPackage
      */
-    public async attachNew(newPackage: IDataPackage): Promise<IAttachNewResult | IAttachNewErrorResult> {
+    public async attachNew(newPackage: IDataPackage): Promise<IAttachSuccessResult | IAttachFailedResult> {
         try {
             await this.initLastMamState();
         } catch (e) {
@@ -130,7 +130,7 @@ export default class IOTAWriter {
         return { address: message.address, nextRoot: message.state.channel.next_root };
     }
 
-    public static attachNewError(result: IAttachNewResult | IAttachNewErrorResult): result is IAttachNewErrorResult {
-        return (typeof (result as IAttachNewErrorResult).error) !== "undefined";
+    public static attachFailed(result: IAttachSuccessResult | IAttachFailedResult): result is IAttachFailedResult {
+        return (typeof (result as IAttachFailedResult).error) !== "undefined";
     }
 }
