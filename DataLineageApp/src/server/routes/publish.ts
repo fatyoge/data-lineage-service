@@ -20,7 +20,7 @@ router
                 res.status(400).end("missing request body");
                 return;
             }
-            var newPackage = req.body as IDataPackage
+            var newPackage = req.body as IDataPackage;
             if (!newPackage.dataPackageId || !newPackage.wayOfProof || !newPackage.valueOfProof) {
                 res.status(400).end("dataPackageId, wayOfProof and valueOfProof are mandatory. The field name is case sensitive.");
                 return;
@@ -35,8 +35,8 @@ router
             try {
                 const reqBody = req.body as IDataPackage;
                 const attachResult = await writer.attachNew(reqBody);
-                if (typeof attachResult === "undefined") {
-                    res.status(500).end(`Failed to publish to the tangle.`);
+                if (IOTAWriter.attachNewError(attachResult)) {
+                    res.status(500).end(`Failed to publish to the tangle. the error is ${attachResult.error}`);
                 } else if (attachResult.address) {
                     reqBody.mamAddress = attachResult.address;
                     reqBody.nextRootAddress = attachResult.nextRoot;

@@ -61,7 +61,7 @@ async function writeData(seed: string, data: IPackageSubmitData): Promise<IDataP
     delete pkg.nextRootAddress;
     try {
         const attachResult = await writer.attachNew(pkg);
-        if (attachResult) {
+        if (!IOTAWriter.attachNewError(attachResult)) {
             pkg.mamAddress = attachResult.address;
             pkg.nextRootAddress = attachResult.nextRoot;
         }
