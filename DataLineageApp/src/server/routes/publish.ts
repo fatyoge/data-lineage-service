@@ -36,7 +36,7 @@ router
                 const reqBody = req.body as IDataPackage;
                 const attachResult = await writer.attachNew(reqBody);
                 if (IOTAWriter.attachNewError(attachResult)) {
-                    res.status(500).end(`Failed to publish to the tangle. the error is ${attachResult.error}`);
+                    res.status(400).end(`Failed to publish to the tangle. the error is ${attachResult.error}`);
                 } else if (attachResult.address) {
                     reqBody.mamAddress = attachResult.address;
                     reqBody.nextRootAddress = attachResult.nextRoot;
