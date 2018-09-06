@@ -35,8 +35,8 @@ The application supports fall-back mechanism for connecting to multiple nodes: Y
 
 It also supports proxy to speed up the access to the IOTA.
 
-### Server Configuration
-As mentationed in previous section, the server will read the source code of [config file](https://github.com/veracity/DataLineage-Viewer/blob/master/DataLineageApp/src/server/server-config.ts), but we alos support to overwrite the value in the static source code. When server start running, it will frist to load the content of file **server-config** (it is a json file that is of the same schema of the `IConfig`) in the **data** folder. Later, when the code to access the config value, if the value is not presented in the loaded file content, the default value defined in the source code will be used. So it is possible to provide the server-config file to overwrite the default value in source code.
+### Override Configuration
+As mentationed in above, you can specify the IOTA node address (and other settings) in [config file](https://github.com/veracity/DataLineage-Viewer/blob/master/DataLineageApp/src/server/server-config.ts), but we also support to overwrite the value in the static source code. When server start running, it will load the content of file **server-config** first (it is a json file that is of the same schema of the `IConfig`) in the **data** folder. Then, if one of the config values is not presented in the loaded file content, the default value from the source code will be used. So it is possible to provide the server-config file to overwrite the default value in source code.
 
 ### Caching
 In order to have a good performance, also considering the data is immutable in tangle (assuming it talks to a [permanode](https://iota.stackexchange.com/questions/782/full-node-vs-permanode/783)), we decide to use caching. 
