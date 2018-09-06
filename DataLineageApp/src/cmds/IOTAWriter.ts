@@ -9,6 +9,15 @@ export interface IIOTAWriterJsonData {
     lastUsedAddress;
 }
 
+export interface IAttachSuccessResult {
+    address: string;
+    nextRoot: string;
+}
+
+export interface IAttachFailedResult {
+    error: string ;
+}
+
 export default class IOTAWriter {
     private readonly _iota: IOTA;
     private _lastMamState;
@@ -87,32 +96,47 @@ export default class IOTAWriter {
      * @returns if success, return the address of the package and the next root address in the same channel, otherwise return undefined
      * @param newPackage
      */
-    public async attachNew(newPackage: IDataPackage): Promise<{ address: string; nextRoot: string } | undefined> {
+    public async attachNew(newPackage: IDataPackage): Promise<IAttachSuccessResult | IAttachFailedResult> {
         try {
             await this.initLastMamState();
         } catch (e) {
-            console.error(`check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`);
-            return undefined;
+            const err = `check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`;
+            console.error(err);
+            return { error: err };
         }
         const json = JSON.stringify(newPackage);
+        if (Utilities.containsUnicode(json)) {
+            const err = "the package data contains none ASCII chars";
+            console.error(err);
+            return { error: err };
+        }
         console.log(`submitting new package ${json} ...`);
         // Create Trytes
         const trytes = this._iota.utils.toTrytes(json);
         if (!trytes) {
-            console.error(`MAM library can't convert the json string ${json} to trytes string`);
-            return undefined;
+            const err = `MAM library can't convert the json string ${json} to trytes string`;
+            console.error(err);
+            return { error: err };
         }
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
 
         // Attach the payload.
-        await Mam.attach(message.payload, message.address);
+        const result = await Mam.attach(message.payload, message.address);
+        if (typeof result === "undefined"||typeof (result.length) === "undefined") {
+            //the Mam.attach return caught error, means it failed
+            const err = `MAM library can't attach the package to trytes, the error is ${JSON.stringify(result)}`;
+            console.error(err);
+            return { error: err };
+        }
         // update mamState as new mamState
         this._lastMamState = message.state;
         this._lastUsedAddress = message.address;
         console.log(`package ${json} is submitted, the address is ${message.address}`);
         return { address: message.address, nextRoot: message.state.channel.next_root };
-
     }
 
+    public static attachFailed(result: IAttachSuccessResult | IAttachFailedResult): result is IAttachFailedResult {
+        return (typeof (result as IAttachFailedResult).error) !== "undefined";
+    }
 }

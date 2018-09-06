@@ -11,27 +11,28 @@ interface IIOTAFetchResult {
 export default class IOTAReader {
     constructor(private readonly _iotaProvider: string) {}
 
-    private fetchMam(address: string): Promise<IIOTAFetchResult | null> {
+    private async fetchMam(address: string): Promise<IIOTAFetchResult | null> {
         console.log(`trying to fetch package of address '${address}' from provider ${this._iotaProvider}`);
         const iota = new IOTA({ provider: this._iotaProvider });
         const mamState = Mam.init(iota);
-        //ToDo: if fetchSingle get exception, what will happen
-        return Mam.fetchSingle(address, "public", null)
-            .then((mamResult: { payload: string, nextRoot: string }) => {
-                if (!mamResult) {
-                    console.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
-                    return null;
-                }
-                console.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
-                return {
-                    json: iota.utils.fromTrytes(mamResult.payload),
-                    nextRootAddress: mamResult.nextRoot
-                };
-            }).catch(reason => {
-                console.error(
-                    `Fetch package of address '${address}' failed with error ${JSON.stringify(reason)} from ${this._iotaProvider}`);
-                return null;
-            });
+
+        /*const fetchedData: any[] = [];
+        const msg = await Mam.fetch(address, "public", null, (data:any, a2, a3, a4) => {
+            fetchedData.push(data);
+            if (a2 && a3 && a4) {
+                console.log("ok");
+            }
+        });*/
+        const mamResult: { payload: string, nextRoot: string } = await Mam.fetchSingle(address, "public", null);
+        if (!mamResult) {
+            console.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
+            return null;
+        }
+        console.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
+        return {
+            json: iota.utils.fromTrytes(mamResult.payload),
+            nextRootAddress: mamResult.nextRoot
+        };
     }
 
     async fetchPackageInfo(address: string, useCache: boolean = true): Promise<IDataPackage | null> {

@@ -31,7 +31,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", index);
 app.use("/simulate", simulate.routerUI);
 app.use("/api/address", address);
-app.use("/api/simulate", simulate.routerApi);
 app.use("/api/publish", publish);
 
 //swagger
