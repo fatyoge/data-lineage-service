@@ -47,6 +47,7 @@
     "webpack-cli": "^2.1.5"
   },
   "dependencies": {
+    "applicationinsights": "^1.0.4",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.0",
     "crypto": "^1.0.1",

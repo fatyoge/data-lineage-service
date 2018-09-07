@@ -1,5 +1,6 @@
 ﻿import * as http from "http";
 import SocketIO = require("socket.io");
+import { Logger } from "../common/logger";
 
 export class SocketIOServer {
     private readonly _IO: SocketIO.Server;
@@ -12,11 +13,11 @@ export class SocketIOServer {
     }
 
     private onClientConnect(socket: SocketIO.Socket): void {
-        console.log(`a user connected from ${socket.client.conn.remoteAddress}`);
+        Logger.log(`a user connected from ${socket.client.conn.remoteAddress}`);
         this._Clients[socket.client.id] = socket;
         socket.on("disconnecting",
             reason => {
-                console.log(`One client (id: ${socket.client.id}) is disconnecting with the reason '${reason}'`);
+                Logger.log(`One client (id: ${socket.client.id}) is disconnecting with the reason '${reason}'`);
                 delete this._Clients[socket.client.id];
             });
     }
@@ -27,10 +28,10 @@ export class SocketIOServer {
             try {
                 this._Clients[clientId].emit(event, msg);
             } catch (e) {
-                console.error(`send message to client (id:${clientId}, ip:${this._Clients[clientId].client.conn.remoteAddress}) faile with error ${e}`);
+                Logger.error(`send message to client (id:${clientId}, ip:${this._Clients[clientId].client.conn.remoteAddress}) faile with error ${e}`);
             }
         } else {
-            console.warn(`Can't find client with id ${clientId}`);
+            Logger.warn(`Can't find client with id ${clientId}`);
         }
     }
 }

@@ -2,6 +2,7 @@
 import config from "../server-config";
 import { IDataPackage } from "../data-package";
 import IOTAReader from "../../cmds/IOTAReader";
+import { Logger } from "../../common/logger";
 
 const router = express.Router();
 
@@ -29,17 +30,17 @@ function waitAny<T>(promises: Promise<T>[]): Promise<T> {
             .then(value => {
                 finishedPromisesCount++;
                 if (!resolved && value) {
-                    console.log(`waitAny function get one promise resolved for the first time, value is ${JSON.stringify(value)}`);
+                    Logger.log(`waitAny function get one promise resolved for the first time, value is ${JSON.stringify(value)}`);
                     promiseOp.resolve(value);
                     resolved = true;
                 } else if (!resolved && finishedPromisesCount >= promises.length) {
-                    console.log(`waitAny function all are finished, but none return a value, so return null instead`);
+                    Logger.log(`waitAny function all are finished, but none return a value, so return null instead`);
                     promiseOp.resolve(null);
                     resolved = true;
                 }
             })
             .catch(reason => {
-                console.error(`waitAny function get one promise failed with reason ${JSON.stringify(reason)}`);
+                Logger.error(`waitAny function get one promise failed with reason ${JSON.stringify(reason)}`);
                 //ToDo: Log the reason
                 finishedPromisesCount++;
                 if (!resolved && finishedPromisesCount >= promises.length) {
@@ -62,7 +63,7 @@ async function fetchPackageInfoWithCache(address: string): Promise<IDataPackage 
             const firstFound = await reader.fetchPackageInfo(address, true);
             if (firstFound) return firstFound;
         } catch (e) {
-            console.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} from ${config.iotaProviders[i]}`);
+            Logger.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} from ${config.iotaProviders[i]}`);
         }
     }
 

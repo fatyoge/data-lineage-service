@@ -2,6 +2,7 @@
 import { packageCache } from "../server/server-global-cache";
 import IOTA = require("iota.lib.js");
 import * as Mam from "../../../mam.client.js/lib/mam.client";
+import { Logger } from "../common/logger";
 
 interface IIOTAFetchResult {
     json: string;
@@ -12,7 +13,7 @@ export default class IOTAReader {
     constructor(private readonly _iotaProvider: string) {}
 
     private async fetchMam(address: string): Promise<IIOTAFetchResult | null> {
-        console.log(`trying to fetch package of address '${address}' from provider ${this._iotaProvider}`);
+        Logger.log(`trying to fetch package of address '${address}' from provider ${this._iotaProvider}`);
         const iota = new IOTA({ provider: this._iotaProvider });
         const mamState = Mam.init(iota);
 
@@ -20,15 +21,15 @@ export default class IOTAReader {
         const msg = await Mam.fetch(address, "public", null, (data:any, a2, a3, a4) => {
             fetchedData.push(data);
             if (a2 && a3 && a4) {
-                console.log("ok");
+                Logger.log("ok");
             }
         });*/
         const mamResult: { payload: string, nextRoot: string } = await Mam.fetchSingle(address, "public", null);
         if (!mamResult) {
-            console.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
+            Logger.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
             return null;
         }
-        console.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
+        Logger.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
         return {
             json: iota.utils.fromTrytes(mamResult.payload),
             nextRootAddress: mamResult.nextRoot
@@ -44,7 +45,7 @@ export default class IOTAReader {
             const cached = packageCache.get(address);
             //for old cache, there is no nextRootAddress, so we need to check this and update them
             if (cached && cached.nextRootAddress) {
-                console.log(`Package of address '${address}' is found from cache, just return it`);
+                Logger.log(`Package of address '${address}' is found from cache, just return it`);
                 return cached;
             }
         }
@@ -53,12 +54,12 @@ export default class IOTAReader {
         try {
             firstFound = await this.fetchMam(address);
         } catch (e) {
-            console.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} from ${this._iotaProvider}`);
+            Logger.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} from ${this._iotaProvider}`);
         }
 
         try {
             if (firstFound) {
-                console.log(`package of address ${address} is fetched from this provider ${this._iotaProvider}`);
+                Logger.log(`package of address ${address} is fetched from this provider ${this._iotaProvider}`);
                 const found: IDataPackage = {
                     ...JSON.parse(firstFound.json),
                     mamAddress: address,
@@ -70,7 +71,7 @@ export default class IOTAReader {
             return null;
         } catch (e) {
             //ToDo: Log
-            console.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} when use provider ${this._iotaProvider}`);
+            Logger.error(`Fetch package of address '${address}' failed with error ${JSON.stringify(e)} when use provider ${this._iotaProvider}`);
             //if all not found, then will reject, so get the exception
             //we return an empty object to indicate it no result
             return null;
