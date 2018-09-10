@@ -2,6 +2,7 @@
 import * as Mam from "../../../mam.client.js/lib/mam.client";
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";
+import { Logger, LogEvents } from "../common/logger";
 
 export interface IIOTAWriterJsonData {
     iotaProvider: string;
@@ -25,10 +26,10 @@ export default class IOTAWriter {
 
     constructor(private readonly _iotaProvider: string, private readonly _seed?: string, lastUsedAddress?: string) {
         if (!_seed) {
-            console.log("seed is not provided");
-            throw new Error("seed is missing")
+            Logger.log("IOTAWriter: Creating an IOTAWriter without seed.");
+            throw new Error("seed is missing");
         }
-        console.log(`Creating IOTA writer with provider:  ${_iotaProvider}`);
+        Logger.log(`Creating IOTA writer with provider:  ${_iotaProvider}`);
         this._iota = new IOTA({ provider: _iotaProvider });
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
@@ -37,7 +38,7 @@ export default class IOTAWriter {
 
     public static toJsonData(writer: IOTAWriter): IIOTAWriterJsonData|undefined {
         if (!writer || !writer._seed || !writer._iotaProvider) {
-            console.error("iotaWriter is not a valid writer or _iotaProvider, or _seed is missing");
+            Logger.error("IOTAWriter: iotaWriter is not a valid writer or _iotaProvider, or _seed is missing");
             return undefined;
         }
         return {
@@ -54,7 +55,7 @@ export default class IOTAWriter {
         if (this._lastMamState) {
             return;
         }
-        console.log("Searching the last used address in the channel...");
+        Logger.log("IOTAWriter: Searching the last used address in the channel...");
         let mamState = Mam.init(this._iota, this._seed);
         //as the seed may already exist, and after Mam.init, mamState always points to the root of the channel, we need to make mamState point to the last
         let rootAddress = Mam.getRoot(mamState);
@@ -67,10 +68,10 @@ export default class IOTAWriter {
         }
         
         while (true) {
-            console.log(`checking address ${rootAddress} if is used or not...`);
+            Logger.log(`IOTAWriter: checking address ${rootAddress} if is used or not...`);
             const one: { nextRoot: string, payload: string } = await Mam.fetchSingle(rootAddress, "public");
             const used = one && one.payload;
-            console.log(`address ${rootAddress} is ${used ? "used" : "last"}`);
+            Logger.log(`IOTAWriter: address ${rootAddress} is ${used ? "used" : "last"}`);
             if (!used) break;
             preAddress = rootAddress;
             rootAddress = one.nextRoot;
@@ -88,7 +89,7 @@ export default class IOTAWriter {
             }
             mamState = message.state;
         }
-        console.log(`Updated MAM client state to last used address of seed: ${(this._seed as string).substring(0, 5)}...`);
+        Logger.log(`IOTAWriter: Updated MAM client state to last used address of seed: ${(this._seed as string).substring(0, 5)}...`);
         this._lastMamState = mamState;
     }
 
@@ -100,39 +101,46 @@ export default class IOTAWriter {
         try {
             await this.initLastMamState();
         } catch (e) {
-            const err = `check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`;
-            console.error(err);
-            return { error: err };
+            return { error: Logger.error(`IOTAWriter: check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`) };
         }
+        const fullTimeStart = Date.now();
         const json = JSON.stringify(newPackage);
         if (Utilities.containsUnicode(json)) {
-            const err = "the package data contains none ASCII chars";
-            console.error(err);
+            const err = "IOTAWriter: the package data contains none ASCII chars";
+            Logger.error(err);
             return { error: err };
         }
-        console.log(`submitting new package ${json} ...`);
+        Logger.log(`IOTAWriter: converting new package ${json} to trytes`);
         // Create Trytes
         const trytes = this._iota.utils.toTrytes(json);
         if (!trytes) {
-            const err = `MAM library can't convert the json string ${json} to trytes string`;
-            console.error(err);
+            const err = `IOTAWriter: MAM library can't convert the json string ${json} to trytes string`;
+            Logger.error(err);
             return { error: err };
         }
+
+        Logger.log(`IOTAWriter: createing message for new package ${json} ...`);
+        const msgCreateTimeStart = Date.now();
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
+        Logger.event(LogEvents.Performance, {}, {["Message Create"]: Date.now() - msgCreateTimeStart});
 
+        Logger.log(`IOTAWriter: begin attaching message to iota for new package ${json} ...`);
+        const msgAttachTimeStart = Date.now();
         // Attach the payload.
         const result = await Mam.attach(message.payload, message.address);
+        Logger.event(LogEvents.Performance, {}, {["Message Attach"]: Date.now() - msgAttachTimeStart});
+        Logger.event(LogEvents.Performance, {}, {["Full Write"]: Date.now() - fullTimeStart});
         if (typeof result === "undefined"||typeof (result.length) === "undefined") {
             //the Mam.attach return caught error, means it failed
             const err = `MAM library can't attach the package to trytes, the error is ${JSON.stringify(result)}`;
-            console.error(err);
+            Logger.error(err);
             return { error: err };
         }
         // update mamState as new mamState
         this._lastMamState = message.state;
         this._lastUsedAddress = message.address;
-        console.log(`package ${json} is submitted, the address is ${message.address}`);
+        Logger.log(`IOTAWriter: package ${json} is attached, the address is ${message.address}`);
         return { address: message.address, nextRoot: message.state.channel.next_root };
     }
 

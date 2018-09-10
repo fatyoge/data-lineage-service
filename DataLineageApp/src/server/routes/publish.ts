@@ -3,6 +3,7 @@ import config from "../server-config";
 import { writersCache } from "../server-global-cache";
 import IOTAWriter from "../../cmds/IOTAWriter";
 import { IDataPackage } from "../data-package";
+import { Logger } from "../../common/logger";
 
 const router = express.Router();
 router
@@ -28,7 +29,7 @@ router
 
             let writer = writersCache.get(seed) as IOTAWriter;
             if (!writer) {
-                console.log(`IOTA writer is NOT found from cache for seed: ${seed.substring(0, 5)}..., create one.`);
+                Logger.log(`IOTA writer is NOT found from cache for seed: ${seed.substring(0, 5)}..., create one.`);
                 writer = new IOTAWriter(config.iotaProviders[0], seed);
                 writersCache.set(seed, writer);
             }

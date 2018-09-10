@@ -1,6 +1,7 @@
 ﻿import globalTunnel = require("global-tunnel");
 import flatCache = require("flat-cache");
 import path = require("path");
+import { Logger } from "../common/logger";
 
 export interface IConfig {
     /**
@@ -27,13 +28,13 @@ class Config implements IConfig {
     private _iotaProviders: string[];
     get iotaProviders(): string[] {
         if (!this._iotaProviders) {
-            console.log("Reading iotaProviders and internal field is undefined, trying to load from data file cache");
+            Logger.log("Reading iotaProviders and internal field is undefined, trying to load from data file cache");
             this._iotaProviders = this._fileData.getKey("iotaProviders");
             if (!this._iotaProviders) {
-                console.log("iotaProviders loaded from data file cache, but has no data, use an empty array to initialize it");
+                Logger.log("iotaProviders loaded from data file cache, but has no data, use an empty array to initialize it");
                 this._iotaProviders = [];
             } else {
-                console.log(`iotaProviders loaded from data file cache with the data ${JSON.stringify(this._iotaProviders, null, 4)}`);
+                Logger.log(`iotaProviders loaded from data file cache with the data ${JSON.stringify(this._iotaProviders, null, 4)}`);
             }
         }
         if (this._iotaProviders.length <= 0) {
@@ -47,9 +48,9 @@ class Config implements IConfig {
         if (!this._iotaProviders) {
             this._iotaProviders = [];
         }
-        console.log(`iotaProviders is changed to ${JSON.stringify(this._iotaProviders, null, 4)}`);
+        Logger.log(`iotaProviders is changed to ${JSON.stringify(this._iotaProviders, null, 4)}`);
         this._fileData.setKey("iotaProviders", this._iotaProviders);
-        console.log("save iotaProviders to data file");
+        Logger.log("save iotaProviders to data file");
         this._fileData.save();
     }
 
@@ -67,7 +68,7 @@ class Config implements IConfig {
             c = config as IConfig;
 
         if (c.proxy) {
-            console.log("server-config is configured with a proxy, use it for all http(s) request from server");
+            Logger.log("server-config is configured with a proxy, use it for all http(s) request from server");
             globalTunnel.initialize({
                 host: c.proxy.host,
                 port: c.proxy.port

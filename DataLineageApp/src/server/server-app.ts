@@ -1,6 +1,5 @@
 ﻿import debug = require("debug");
 import express = require("express");
-
 import path = require("path");
 import logger = require("morgan");
 import cookieParser = require("cookie-parser");
@@ -11,6 +10,7 @@ import * as simulate from "./routes/simulate";
 import publish from "./routes/publish";
 import config from "./server-config";
 import { initIOServer } from "./socket.io-server";
+import { Logger } from "../common/logger";
 
 config.useProxyIfConfigured();
 
@@ -80,6 +80,6 @@ app.use(<any>((err, req, res, next) => {
 app.set("port", process.env.PORT || 3000);
 
 const server = app.listen(app.get("port"), () => {
-    debug("Express server listening on port " + server.address().port);
+    Logger.log("Express server listening on port " + server.address().port);
 });
 initIOServer(server);
