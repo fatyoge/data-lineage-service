@@ -10,11 +10,20 @@ export enum LogLevel {
     Error
 }
 
+export class LogEvents {
+    public static readonly Performance = "IOTA Write Performance";
+}
+
 export interface ILoggerProvider {
     log(msg: string, level: LogLevel):void;
+    event(name: string, properties?:any, customData?:{[key: string]: number;}): void;
 }
 
 export class ConsoleLoggerProvider implements ILoggerProvider {
+    event(name: string, properties?: any, customData?: { [key: string]: number; }): void {
+        console.log(`Event: ${name}, properties:${JSON.stringify(properties?properties:{})}, customeData:${JSON.stringify(customData?customData:{})}`);
+    }
+
     log(msg: string, level: LogLevel): void {
         switch (level) {
         case LogLevel.Information:
@@ -35,6 +44,10 @@ export class ConsoleLoggerProvider implements ILoggerProvider {
 }
 
 export class AppInsightProvider implements ILoggerProvider {
+    event(name: string, properties?: any, customData?: { [key: string]: number; }): void {
+        const client = appInsights.defaultClient;
+        client.trackEvent({name: name, properties: properties, measurements: customData});
+    }
 
     log(msg: string, level: LogLevel): void {
         const client = appInsights.defaultClient;
@@ -78,6 +91,10 @@ export class Logger {
 
     public static warn(msg: string): string {
         return Logger.log(msg, LogLevel.Warning);
+    }
+
+    public static event(name: string, properties?: any, customData?: { [key: string]: number; }):void {
+        Logger.providers.forEach(p => p.event(name, properties, customData));
     }
 }
 

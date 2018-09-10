@@ -2,7 +2,7 @@
 import * as Mam from "../../../mam.client.js/lib/mam.client";
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";
-import { Logger } from "../common/logger";
+import { Logger, LogEvents } from "../common/logger";
 
 export interface IIOTAWriterJsonData {
     iotaProvider: string;
@@ -103,6 +103,7 @@ export default class IOTAWriter {
         } catch (e) {
             return { error: Logger.error(`IOTAWriter: check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`) };
         }
+        const fullTimeStart = Date.now();
         const json = JSON.stringify(newPackage);
         if (Utilities.containsUnicode(json)) {
             const err = "IOTAWriter: the package data contains none ASCII chars";
@@ -119,12 +120,17 @@ export default class IOTAWriter {
         }
 
         Logger.log(`IOTAWriter: createing message for new package ${json} ...`);
+        const msgCreateTimeStart = Date.now();
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
+        Logger.event(LogEvents.Performance, {}, {["Message Create"]: Date.now() - msgCreateTimeStart});
 
         Logger.log(`IOTAWriter: begin attaching message to iota for new package ${json} ...`);
+        const msgAttachTimeStart = Date.now();
         // Attach the payload.
         const result = await Mam.attach(message.payload, message.address);
+        Logger.event(LogEvents.Performance, {}, {["Message Attach"]: Date.now() - msgAttachTimeStart});
+        Logger.event(LogEvents.Performance, {}, {["Full Write"]: Date.now() - fullTimeStart});
         if (typeof result === "undefined"||typeof (result.length) === "undefined") {
             //the Mam.attach return caught error, means it failed
             const err = `MAM library can't attach the package to trytes, the error is ${JSON.stringify(result)}`;
