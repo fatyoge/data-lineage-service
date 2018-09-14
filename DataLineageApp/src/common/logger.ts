@@ -14,6 +14,23 @@ export class LogEvents {
     public static readonly Performance = "IOTA Write Performance";
 }
 
+export class LogEventMeasurements {
+    public static readonly MamInit = "Mam Init";
+    public static readonly MamGetRoot = "Mam Get Root";
+    public static readonly MessageFetch = "Message Fetch";
+    public static readonly MamStateUpdate = "Mam State Update";
+    public static readonly MessageDataNonASCIIVerify = "Verify Not ASCII Message";
+    public static readonly MessageDataTrytes = "Message Data Trytes";
+    public static readonly MessageCreate = "Message Create";
+    public static readonly MessageAttach = "Message Attach";
+    public static readonly FullWrite = "Full Write";
+}
+
+export class LogEventProperties {
+    public static readonly Serial = "Serial";
+    public static readonly Seed = "Seed";
+}
+
 export interface ILoggerProvider {
     log(msg: string, level: LogLevel):void;
     event(name: string, properties?:any, customData?:{[key: string]: number;}): void;
