@@ -2,7 +2,7 @@
 import * as Mam from "../../../mam.client.js/lib/mam.client";
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";
-import { Logger, LogEvents } from "../common/logger";
+import { Logger, LogEvents, LogEventMeasurements, LogEventProperties } from "../common/logger";
 
 export interface IIOTAWriterJsonData {
     iotaProvider: string;
@@ -48,17 +48,25 @@ export default class IOTAWriter {
         };
     }
 
+    private logEventProps(logSerialTag: string): any {
+        return { [LogEventProperties.Serial]: this._seed, [LogEventProperties.Serial]: logSerialTag };
+    }
+
     /**
      * make sure the _lastMamState represent the last address of the attached node in the channel, so that the new add node can be attached successfully
      */
-    private async initLastMamState(): Promise<void> {
+    private async initLastMamState(logSerialTag: string): Promise<void> {
         if (this._lastMamState) {
             return;
         }
         Logger.log("IOTAWriter: Searching the last used address in the channel...");
+        let startTime = Date.now();
         let mamState = Mam.init(this._iota, this._seed);
+        Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MamInit]: Date.now() - startTime });
+        startTime = Date.now();
         //as the seed may already exist, and after Mam.init, mamState always points to the root of the channel, we need to make mamState point to the last
         let rootAddress = Mam.getRoot(mamState);
+        Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MamGetRoot]: Date.now() - startTime });
         let preAddress: string | undefined = undefined; //if keep undefined, means 
 
         //if we already know the last used address, jump to it directly
@@ -66,10 +74,12 @@ export default class IOTAWriter {
             rootAddress = this._lastUsedAddress;
             preAddress = this._lastUsedAddress;
         }
-        
+
         while (true) {
             Logger.log(`IOTAWriter: checking address ${rootAddress} if is used or not...`);
+            startTime = Date.now();
             const one: { nextRoot: string, payload: string } = await Mam.fetchSingle(rootAddress, "public");
+            Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MessageFetch]: Date.now() - startTime });
             const used = one && one.payload;
             Logger.log(`IOTAWriter: address ${rootAddress} is ${used ? "used" : "last"}`);
             if (!used) break;
@@ -83,7 +93,9 @@ export default class IOTAWriter {
         //loop until message is point to the last attached node
         //if preAddress not defined, means the channel is empty (previous "while" loop stopped at used check for the first time)
         while (preAddress) {
-            message = Mam.create(mamState, this._iota.utils.toTrytes(JSON.stringify({ "data":"This is a fake message to find last address" })));
+            startTime = Date.now();
+            message = Mam.create(mamState, this._iota.utils.toTrytes(JSON.stringify({ "data": "This is a fake message to find last address" })));
+            Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MamStateUpdate]: Date.now() - startTime });
             if (message.address === preAddress) {
                 break;
             }
@@ -98,21 +110,26 @@ export default class IOTAWriter {
      * @param newPackage
      */
     public async attachNew(newPackage: IDataPackage): Promise<IAttachSuccessResult | IAttachFailedResult> {
+        const serial = newPackage.dataPackageId;
+        const fullTimeStart = Date.now();
         try {
-            await this.initLastMamState();
+            await this.initLastMamState(serial);
         } catch (e) {
             return { error: Logger.error(`IOTAWriter: check the last address for seed ${this._seed} failed, exception is ${JSON.stringify(e)}`) };
         }
-        const fullTimeStart = Date.now();
         const json = JSON.stringify(newPackage);
+        let startTime = Date.now();
         if (Utilities.containsUnicode(json)) {
             const err = "IOTAWriter: the package data contains none ASCII chars";
             Logger.error(err);
             return { error: err };
         }
+        Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageDataNonASCIIVerify]: Date.now() - startTime });
         Logger.log(`IOTAWriter: converting new package ${json} to trytes`);
         // Create Trytes
+        startTime = Date.now();
         const trytes = this._iota.utils.toTrytes(json);
+        Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageDataTrytes]: Date.now() - startTime });
         if (!trytes) {
             const err = `IOTAWriter: MAM library can't convert the json string ${json} to trytes string`;
             Logger.error(err);
@@ -120,17 +137,16 @@ export default class IOTAWriter {
         }
 
         Logger.log(`IOTAWriter: createing message for new package ${json} ...`);
-        const msgCreateTimeStart = Date.now();
+        startTime = Date.now();
         // Get MAM payload
         const message: { payload: string, address: string, state: any } = Mam.create(this._lastMamState, trytes);
-        Logger.event(LogEvents.Performance, {}, {["Message Create"]: Date.now() - msgCreateTimeStart});
-
+        Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageCreate]: Date.now() - startTime });
         Logger.log(`IOTAWriter: begin attaching message to iota for new package ${json} ...`);
-        const msgAttachTimeStart = Date.now();
+        startTime = Date.now();
         // Attach the payload.
         const result = await Mam.attach(message.payload, message.address);
-        Logger.event(LogEvents.Performance, {}, {["Message Attach"]: Date.now() - msgAttachTimeStart});
-        Logger.event(LogEvents.Performance, {}, {["Full Write"]: Date.now() - fullTimeStart});
+        Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageAttach]: Date.now() - startTime });
+        
         if (typeof result === "undefined"||typeof (result.length) === "undefined") {
             //the Mam.attach return caught error, means it failed
             const err = `MAM library can't attach the package to trytes, the error is ${JSON.stringify(result)}`;
@@ -141,6 +157,7 @@ export default class IOTAWriter {
         this._lastMamState = message.state;
         this._lastUsedAddress = message.address;
         Logger.log(`IOTAWriter: package ${json} is attached, the address is ${message.address}`);
+        Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.FullWrite]: Date.now() - fullTimeStart });
         return { address: message.address, nextRoot: message.state.channel.next_root };
     }
 
