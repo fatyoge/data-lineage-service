@@ -1,4 +1,8 @@
 ﻿import IOTA = require("iota.lib.js");
+
+// Import the Monkey Patch for the IOTA lib
+import * as usePowSrvIO from "../../node_modules/iota.lib.js.powsrvio"
+
 import * as Mam from "../../../mam.client.js/lib/mam.client";
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";
@@ -31,6 +35,10 @@ export default class IOTAWriter {
         }
         Logger.log(`Creating IOTA writer with provider:  ${_iotaProvider}`);
         this._iota = new IOTA({ provider: _iotaProvider });
+
+        // Patch the current IOTA instance
+        usePowSrvIO(this._iota, 5000, null);
+
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
         }
