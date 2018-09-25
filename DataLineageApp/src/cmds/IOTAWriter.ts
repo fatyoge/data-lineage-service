@@ -37,7 +37,7 @@ export default class IOTAWriter {
         this._iota = new IOTA({ provider: _iotaProvider });
 
         // Patch the current IOTA instance
-        usePowSrvIO(this._iota, 5000, null);
+        usePowSrvIO(this._iota, 5000, null)
 
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
