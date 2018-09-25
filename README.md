@@ -25,8 +25,8 @@ all functionalities are exposed as APIs.
 The detailed API documentation can be found at http://datalineage-viewer.azurewebsites.net/swagger/ 
 
 ## Technical details
-### Architect
-![Architect](https://github.com/veracity/DataLineage-Viewer/blob/master/Doc/System%20architect.png?raw=true)
+### Architecture
+![Architecture](https://github.com/veracity/DataLineage-Viewer/blob/master/Doc/System%20architect.png?raw=true)
 
 This application is using the official IOTA MAM library https://github.com/iotaledger/mam.client.js for interacting with IOTA tangle. Besides, it is based on Nodejs and Typescript for both frontend and server side.
 
@@ -36,7 +36,7 @@ The application supports fall-back mechanism for connecting to multiple nodes: Y
 It also supports proxy to speed up the access to the IOTA.
 
 ### Outsourcing PoW
-In order to speed up MAM message throughput, instead of run PoW on the Iota node, this application delegate the PoW work to 3rd party Pow provider https://powsrv.io/ (with free tier). 
+In order to speed up MAM message throughput, instead of run PoW on the Iota node that the application is connecting with, this task is delegated to 3rd party Pow provider https://powsrv.io/ (with free tier). 
 
 ### Override Configuration
 As mentationed in above, you can specify the IOTA node address (and other settings) in [config file](https://github.com/veracity/DataLineage-Viewer/blob/master/DataLineageApp/src/server/server-config.ts), but we also support to overwrite the value in the static source code. When server start running, it will load the content of file **server-config** first (it is a json file that is of the same schema of the `IConfig`) in the **data** folder. Then, if one of the config values is not presented in the loaded file content, the default value from the source code will be used. So it is possible to provide the server-config file to overwrite the default value in source code.
