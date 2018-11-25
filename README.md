@@ -9,8 +9,8 @@ In addition, all functionalities are exposed as APIs, which helps developers to 
 http://datalineage-viewer.azurewebsites.net
 
 The demo application is connecting to the IOTA Mainnet, by using the following nodes:
-- https://nodes.iota.fm
-- https://iotanode.us:443
+- https://iota-nod3.de:443
+- https://nodes.thetangle.org:443
 
 ## Functionalities
 ### Lineage viewer
@@ -48,6 +48,10 @@ It means that, whenever the client is requesting package information from an add
 - if the data for this address already exists in cache, simply return it.
 - if the data does not exist, the server will talk to IOTA node that it is connecting with, fetch the data, store it in cache, and then return it.
 For every 3 minutes, the server will save the memory cache to disk file. In case the server was reboot, the cache can be loaded from file to memory.
+
+The cache files are stored in /data folder of the web application server.
+- package.cache
+- iotaWriter.cache (one iotawriter object per one seed/channel, all stored in this cache file)
 
 ### Application Insight
 This app use the Microsoft Application Insight to tracking and logging. If the application is hosted in Azure, you can provide an ikey via the environment variable APPINSIGHTS_INSTRUMENTATIONKEY, or set it directly in the code `logger.ts`, for more information, please refer to the document [Monitor your Node.js services and apps with Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs "Monitor your Node.js services and apps with Application Insights")
