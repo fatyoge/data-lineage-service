@@ -1,4 +1,4 @@
-﻿import globalTunnel = require("global-tunnel");
+﻿import globalTunnel = require("global-tunnel-ng");
 import flatCache = require("flat-cache");
 import path = require("path");
 import { Logger } from "../common/logger";
@@ -38,7 +38,7 @@ class Config implements IConfig {
             }
         }
         if (this._iotaProviders.length <= 0) {
-            return ["https://nodes.iota.fm", "https://iotanode.us:443"];
+            return ["https://nodes.thetangle.org:443", "https://iotanode.us:443"];
         }
         return this._iotaProviders;
     }
