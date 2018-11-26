@@ -38,7 +38,7 @@ class Config implements IConfig {
             }
         }
         if (this._iotaProviders.length <= 0) {
-            return ["https://iota-nod3.de:443", "https://iotanode.us:443"];
+            return ["https://iota-nod3.de:443", "https://nodes.thetangle.org:443"];
         }
         return this._iotaProviders;
     }
