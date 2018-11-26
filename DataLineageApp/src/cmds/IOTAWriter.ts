@@ -28,16 +28,16 @@ export default class IOTAWriter {
     private _lastMamState;
     private _lastUsedAddress: string;
 
-    constructor(private readonly _iotaProvider: string, private readonly _seed?: string, lastUsedAddress?: string) {
+    constructor(public readonly iotaProvider: string, private readonly _seed?: string, lastUsedAddress?: string) {
         if (!_seed) {
             Logger.log("IOTAWriter: Creating an IOTAWriter without seed.");
             throw new Error("seed is missing");
         }
-        Logger.log(`Creating IOTA writer with provider:  ${_iotaProvider}`);
-        this._iota = new IOTA({ provider: _iotaProvider });
+        Logger.log(`Creating IOTA writer with provider:  ${iotaProvider}`);
+        this._iota = new IOTA({ provider: iotaProvider });
 
         // Patch the current IOTA instance
-        usePowSrvIO(this._iota, 5000, null)
+        usePowSrvIO(this._iota, 5000, null);
 
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
@@ -45,12 +45,12 @@ export default class IOTAWriter {
     }
 
     public static toJsonData(writer: IOTAWriter): IIOTAWriterJsonData|undefined {
-        if (!writer || !writer._seed || !writer._iotaProvider) {
+        if (!writer || !writer._seed || !writer.iotaProvider) {
             Logger.error("IOTAWriter: iotaWriter is not a valid writer or _iotaProvider, or _seed is missing");
             return undefined;
         }
         return {
-            iotaProvider: writer._iotaProvider,
+            iotaProvider: writer.iotaProvider,
             seed: writer._seed,
             lastUsedAddress: writer._lastUsedAddress
         };

@@ -1,4 +1,4 @@
-﻿import globalTunnel = require("global-tunnel");
+﻿import globalTunnel = require("global-tunnel-ng");
 import flatCache = require("flat-cache");
 import path = require("path");
 import { Logger } from "../common/logger";

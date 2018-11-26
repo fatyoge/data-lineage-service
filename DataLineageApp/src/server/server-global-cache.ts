@@ -8,8 +8,23 @@ import IOTAWriter from "../cmds/IOTAWriter";
 const pkgFileCacheId = "package.cache";
 const writerFileCacheId = "iotaWriter.cache";
 
+class WriterCache extends MemoryFileCacheSingleType<IOTAWriter> {
+
+    constructor(stdTtl: number, useClones: boolean) {
+        super(stdTtl, useClones);
+    }
+
+    get(key: string): IOTAWriter | undefined {
+        const writer = super.get(key);
+        if (writer && writer.iotaProvider !== config.iotaProviders[0]) {
+            return undefined;
+        }
+        return writer;
+    }
+}
+
 export const packageCache = new MemoryFileCacheSingleType<IDataPackage>(config.pacakgeCacheSeconds, true);
-export const writersCache = new MemoryFileCacheSingleType<IOTAWriter>(config.iotaWriterStateCacheSeconds, false); //it's important, because the writer will update its internal MAM status to track the last address
+export const writersCache = new WriterCache(config.iotaWriterStateCacheSeconds, false); //it's important, because the writer will update its internal MAM status to track the last address
 
 packageCache.loadFromFile(config.dataFolder, pkgFileCacheId);
 writersCache.loadFromFile(config.dataFolder, writerFileCacheId, writer => {
