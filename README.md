@@ -6,11 +6,13 @@ It also provides user-friendly web interface for publishing integrity and lineag
 In addition, all functionalities are exposed as APIs, which helps developers to build/extend their applications to integrate with tangle quickly, without having deep understanding of IOTA or MAM protocol.
 
 ## Live demo
-http://datalineage-viewer.azurewebsites.net
+https://datalineage-viewer.azurewebsites.net
 
 The demo application is connecting to the IOTA Mainnet, by using the following nodes:
 - https://iota-nod3.de:443
 - https://nodes.thetangle.org:443
+
+*NOTE*: Public nodes can be offline without notice. Check more public nodes from community, such as https://www.tangle-nodes.com/index.php?sorts[load]=1
 
 ## Functionalities
 ### Lineage viewer
@@ -22,7 +24,7 @@ This application also provide user friendly interface for publishing data to tan
 
 ## APIs
 all functionalities are exposed as APIs. 
-The detailed API documentation can be found at http://datalineage-viewer.azurewebsites.net/swagger/ 
+The detailed API documentation can be found at https://datalineage-viewer.azurewebsites.net/swagger/ 
 
 ## Technical details
 ### Architecture
