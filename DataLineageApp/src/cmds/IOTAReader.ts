@@ -1,7 +1,7 @@
 ﻿import { IDataPackage } from "../server/data-package";
 import { packageCache } from "../server/server-global-cache";
 import IOTA = require("iota.lib.js");
-import * as Mam from "../../../mam.client.js/lib/mam.client";
+const Mam = require("@iota/mam/lib/mam.client.js");
 import { Logger } from "../common/logger";
 
 interface IIOTAFetchResult {
