@@ -152,7 +152,7 @@ export default class IOTAWriter {
         Logger.log(`IOTAWriter: begin attaching message to iota for new package ${json} ...`);
         startTime = Date.now();
         // Attach the payload.
-        const result = await Mam.attach(message.payload, message.address);
+        const result = await Mam.attach(message.payload, message.address, 3, 14);
         Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageAttach]: Date.now() - startTime });
         
         if (typeof result === "undefined"||typeof (result.length) === "undefined") {

@@ -48,9 +48,7 @@ class Config implements IConfig {
       }
     }
     if (this._iotaProviders.length <= 0) {
-        return [
-          "https://testnet140.tangle.works"
-        ];
+        return ["https://nodes.thetangle.org:443"];
     }
     return this._iotaProviders;
   }
