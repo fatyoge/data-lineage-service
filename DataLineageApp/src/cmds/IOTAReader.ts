@@ -1,7 +1,8 @@
 ﻿import { IDataPackage } from "../server/data-package";
 import { packageCache } from "../server/server-global-cache";
-import IOTA = require("iota.lib.js");
+//import IOTA = require("iota.lib.js");
 const Mam = require("@iota/mam/lib/mam.client.js");
+const { trytesToAscii } = require("@iota/converter");
 import { Logger } from "../common/logger";
 
 interface IIOTAFetchResult {
@@ -14,8 +15,8 @@ export default class IOTAReader {
 
     private async fetchMam(address: string): Promise<IIOTAFetchResult | null> {
         Logger.log(`trying to fetch package of address '${address}' from provider ${this._iotaProvider}`);
-        const iota = new IOTA({ provider: this._iotaProvider });
-        const mamState = Mam.init(iota);
+        //const iota = new IOTA({ provider: this._iotaProvider });
+        const mamState = Mam.init(this._iotaProvider);
 
         /*const fetchedData: any[] = [];
         const msg = await Mam.fetch(address, "public", null, (data:any, a2, a3, a4) => {
@@ -31,7 +32,7 @@ export default class IOTAReader {
         }
         Logger.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
         return {
-            json: iota.utils.fromTrytes(mamResult.payload),
+            json: trytesToAscii(mamResult.payload),
             nextRootAddress: mamResult.nextRoot
         };
     }

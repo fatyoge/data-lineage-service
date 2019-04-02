@@ -1,8 +1,9 @@
-﻿import IOTA = require("iota.lib.js");
+﻿//import IOTA = require("iota.lib.js");
 
 // Import the Monkey Patch for the IOTA lib
-import * as usePowSrvIO from "../../node_modules/iota.lib.js.powsrvio"
+//import * as usePowSrvIO from "../../node_modules/iota.lib.js.powsrvio"
 const Mam = require("@iota/mam/lib/mam.client.js");
+const { asciiToTrytes } = require("@iota/converter");
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";
 import { Logger, LogEvents, LogEventMeasurements, LogEventProperties } from "../common/logger";
@@ -23,7 +24,7 @@ export interface IAttachFailedResult {
 }
 
 export default class IOTAWriter {
-    private readonly _iota: IOTA;
+    //private readonly _iota: IOTA;
     private _lastMamState;
     private _lastUsedAddress: string;
 
@@ -33,10 +34,10 @@ export default class IOTAWriter {
             throw new Error("seed is missing");
         }
         Logger.log(`Creating IOTA writer with provider:  ${iotaProvider}`);
-        this._iota = new IOTA({ provider: iotaProvider });
+        //this._iota = new IOTA({ provider: iotaProvider });
 
         // Patch the current IOTA instance
-        usePowSrvIO(this._iota, 5000, null);
+        //usePowSrvIO(this._iota, 5000, null);
 
         if (lastUsedAddress) {
             this._lastUsedAddress = lastUsedAddress;
@@ -68,7 +69,7 @@ export default class IOTAWriter {
         }
         Logger.log("IOTAWriter: Searching the last used address in the channel...");
         let startTime = Date.now();
-        let mamState = Mam.init(this._iota, this._seed);
+        let mamState = Mam.init(this.iotaProvider, this._seed);
         Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MamInit]: Date.now() - startTime });
         startTime = Date.now();
         //as the seed may already exist, and after Mam.init, mamState always points to the root of the channel, we need to make mamState point to the last
@@ -101,7 +102,7 @@ export default class IOTAWriter {
         //if preAddress not defined, means the channel is empty (previous "while" loop stopped at used check for the first time)
         while (preAddress) {
             startTime = Date.now();
-            message = Mam.create(mamState, this._iota.utils.toTrytes(JSON.stringify({ "data": "This is a fake message to find last address" })));
+            message = Mam.create(mamState, asciiToTrytes(JSON.stringify({data: "This is a fake message to find last address"})));
             Logger.event(LogEvents.Performance, this.logEventProps(logSerialTag), { [LogEventMeasurements.MamStateUpdate]: Date.now() - startTime });
             if (message.address === preAddress) {
                 break;
@@ -135,7 +136,7 @@ export default class IOTAWriter {
         Logger.log(`IOTAWriter: converting new package ${json} to trytes`);
         // Create Trytes
         startTime = Date.now();
-        const trytes = this._iota.utils.toTrytes(json);
+        const trytes = asciiToTrytes(json);
         Logger.event(LogEvents.Performance, this.logEventProps(serial), { [LogEventMeasurements.MessageDataTrytes]: Date.now() - startTime });
         if (!trytes) {
             const err = `IOTAWriter: MAM library can't convert the json string ${json} to trytes string`;
