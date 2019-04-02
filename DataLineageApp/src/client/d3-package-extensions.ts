@@ -256,7 +256,7 @@ d3.selection.prototype.packageNode =
         const s = this as d3.Selection<any, any, any, any>;
         return s.append("g")
             .attr("class", `${drawConfig.nodeCssClass}`)
-            .each((d: TNodeData, index: number, nodes: Element[]) => {
+            .each((d: TNodeData, index: number, nodes: ArrayLike<Element>) => {
                 const n = nodes[index];
                 const pkg = packageInfo(d);
                 //draw the package circle and the outer stroke

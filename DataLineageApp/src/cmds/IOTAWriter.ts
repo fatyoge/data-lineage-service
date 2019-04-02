@@ -2,7 +2,6 @@
 
 // Import the Monkey Patch for the IOTA lib
 import * as usePowSrvIO from "../../node_modules/iota.lib.js.powsrvio"
-
 const Mam = require("@iota/mam/lib/mam.client.js");
 import Utilities from "../common/utilities";
 import { IDataPackage } from "../server/data-package";

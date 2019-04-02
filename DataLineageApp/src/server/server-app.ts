@@ -77,9 +77,15 @@ app.use(<any>((err, req, res, next) => {
         });
 }));
 
-app.set("port", process.env.PORT || 3000);
+const appPort = process.env.PORT || 3000;
+app.set("port", appPort);
 
 const server = app.listen(app.get("port"), () => {
-    Logger.log("Express server listening on port " + server.address().port);
+    const address = server.address();
+    let realPort = appPort;
+    if (address && typeof address !== "string") {
+        realPort = address.port;
+    }
+    Logger.log(`Express server listening on port ${realPort}`);
 });
 initIOServer(server);

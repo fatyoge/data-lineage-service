@@ -154,29 +154,50 @@ class App {
             .attr("fill", d => this._packages.packageColor(d.data.data.mamAddress) as string);
 
         
-        node.each((d, index: number, nodes: Element[]) => {
-            const n = nodes[index];
-            const pkg = d.data.data;
-            //only when the pkg has the inputs and at least one input doesn't in the this._packages, then we will show "+", otherwise all its inputs are exist and will be drawn, so we needn't show "+"
-            const canExpand = pkg.inputs &&
-                pkg.inputs.length > 0 &&
-                pkg.inputs.filter(ia => !this._packages.packageExist(ia, true)).length > 0;
-            const operation = DataOperation.findOperation(pkg.operation);
-            const text = operation ? operation.iocnFontText : (canExpand ? "\uf067" : "");
-            const txtElement = d3.select(n).append("text")
-                .text(text as string)
-                .attr("font-family", "Font Awesome 5 Free")
+        node.each((d, index: number, nodes: ArrayLike<Element>) => {
+          const n = nodes[index];
+          const pkg = d.data.data;
+          //only when the pkg has the inputs and at least one input doesn't in the this._packages, then we will show "+", otherwise all its inputs are exist and will be drawn, so we needn't show "+"
+          const canExpand =
+            pkg.inputs &&
+            pkg.inputs.length > 0 &&
+            pkg.inputs.filter(
+              ia => !this._packages.packageExist(ia, true)
+            ).length > 0;
+          const operation = DataOperation.findOperation(pkg.operation);
+          const text = operation
+            ? operation.iocnFontText
+            : canExpand
+            ? "\uf067"
+            : "";
+          const txtElement = d3
+            .select(n)
+            .append("text")
+            .text(text as string)
+            .attr("font-family", "Font Awesome 5 Free")
             //always add fas, as the plus text is also an font awsome
-                .attr("class", `fas ${drawConfig.plusTxtCssClass} ${canExpand ? "" : `${drawConfig.expandedCssClass}`} ${operation ? operation.iconCss : ""}`);
-           
-            //.attr("fill", color); css will do
-            const rect: SVGRect = (circle.node() as any).getBBox();
-            txtElement.attr("dy", (rect.height / 2) * 0.6).attr("dx", -(rect.width / 2) * 0.65);
+            .attr(
+              "class",
+              `fas ${drawConfig.plusTxtCssClass} ${
+                canExpand ? "" : `${drawConfig.expandedCssClass}`
+              } ${operation ? operation.iconCss : ""}`
+            );
 
-            d3.select(n).append("text")
-                .text(`Owner: ${pkg.ownerMetadata ? pkg.ownerMetadata : "Unkown"}`)
-                .attr("dx", drawConfig.nodeRadius * 1.5)
-                .attr("dy", drawConfig.nodeRadius * 0.5);
+          //.attr("fill", color); css will do
+          const rect: SVGRect = (circle.node() as any).getBBox();
+          txtElement
+            .attr("dy", (rect.height / 2) * 0.6)
+            .attr("dx", -(rect.width / 2) * 0.65);
+
+          d3.select(n)
+            .append("text")
+            .text(
+              `Owner: ${
+                pkg.ownerMetadata ? pkg.ownerMetadata : "Unkown"
+              }`
+            )
+            .attr("dx", drawConfig.nodeRadius * 1.5)
+            .attr("dy", drawConfig.nodeRadius * 0.5);
         });
     }
 

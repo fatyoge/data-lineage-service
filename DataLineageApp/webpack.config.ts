@@ -93,6 +93,11 @@ const configServer:webpack.Configuration = {
                 loader: "ts-loader",//can use either 'awesome-typescript-loader' or "ts-loader", 'awesome-typescript-loader' will compiler ts file in memeory so no js file is generated (finnally, js will be bundle with webpack)
                 exclude: /node_modules/,
                 options: { onlyCompileBundledFiles: true }
+            },
+            {
+                type: 'javascript/auto',
+                test: /\.mjs$/,
+                use: []
             }
         ]
     },
