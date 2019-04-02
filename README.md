@@ -1,4 +1,4 @@
-﻿# Data Lineage Viewer  [![Build Status](https://travis-ci.com/veracity/DataLineage-Viewer.svg?branch=master)](https://travis-ci.com/veracity/DataLineage-Viewer)
+﻿# Data Lineage Viewer  [![Build Status](https://travis-ci.com/veracity/data-lineage-service.svg?branch=master)](https://travis-ci.com/veracity/data-lineage-service)
 This data lineage viewer is a web based application that visualize the data lineage information, based on the paper [Data Integrity and Lineage by using IOTA](http://fenglu.me/2018/04/16/Data-integrity-and-data-lineage-by-using-IOTA/ "Data Integrity and Lineage by using IOTA"). 
 
 It also provides user-friendly web interface for publishing integrity and lineage information to tangle.
@@ -8,8 +8,7 @@ In addition, all functionalities are exposed as APIs, which helps developers to 
 ## Live demo
 https://datalineage-viewer.azurewebsites.net
 
-The demo application is connecting to the IOTA Mainnet, by using the following nodes:
-- https://iota-nod3.de:443
+The demo application is connecting to the IOTA Mainnet, by using the following node(s):
 - https://nodes.thetangle.org:443
 
 *NOTE*: Public nodes can be offline without notice. Check more public nodes from community, such as https://www.tangle-nodes.com/index.php?sorts[load]=1
