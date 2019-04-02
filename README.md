@@ -57,10 +57,8 @@ The cache files are stored in /data folder of the web application server.
 ### Application Insight
 This app use the Microsoft Application Insight to tracking and logging. If the application is hosted in Azure, you can provide an ikey via the environment variable APPINSIGHTS_INSTRUMENTATIONKEY, or set it directly in the code `logger.ts`, for more information, please refer to the document [Monitor your Node.js services and apps with Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-nodejs "Monitor your Node.js services and apps with Application Insights")
 
-## How to clone the source code
+## How to init submodule after cloned the source code
 ```cmd
-git clone https://github.com/veracity/DataLineage-Viewer.git
-cd DataLineage-Viewer
 git submodule update --init 
 ```
 
