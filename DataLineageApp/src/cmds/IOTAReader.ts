@@ -26,8 +26,8 @@ export default class IOTAReader {
             }
         });*/
         const mamResult: { payload: string, nextRoot: string } = await Mam.fetchSingle(address, "public", null);
-        if (!mamResult) {
-            Logger.error(`Package of address '${address}' returned undefined result from provider ${this._iotaProvider}`);
+        if (!mamResult || !mamResult.payload) {
+            Logger.error(`Package of address '${address}' returned undefined result or undefined payload from provider ${this._iotaProvider}`);
             return null;
         }
         Logger.log(`Package of address '${address}' is fetched from provider ${this._iotaProvider}`);
